@@ -11,7 +11,7 @@ let
   };
 in
 stdenv.mkDerivation {
-  name = "purescript-ulid";
+  name = "peregrine";
 
   buildInputs = [
     easy-ps.purs
