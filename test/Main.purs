@@ -2,7 +2,7 @@ module Test.Main where
 
 import Prelude
 import Data.Array (intercalate)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), maybe)
 import Data.String.Utils (lines)
 import Effect (Effect)
 import Effect.Class.Console (log)
@@ -10,6 +10,7 @@ import Peregrine (Handler, Middleware)
 import Peregrine as Peregrine
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
 import Peregrine.Http.Headers as Headers
+import Peregrine.Http.Status (Status)
 import Peregrine.Http.Status as Status
 import Peregrine.Response.Body as Body
 import Type.Proxy (Proxy(..))
@@ -19,14 +20,24 @@ contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
 
 loggingMiddleware :: Middleware
 loggingMiddleware handler req = do
-  log "Received request"
-  log $ "Method: " <> show req.method
-  log "Headers:"
-  log $ indentLines $ show req.headers
+  logRequest req
   response <- handler req
-  log "After handler"
+  logResponse response
   pure response
   where
+  logRequest req' = do
+    log "Received request"
+    log $ "Method: " <> show req'.method
+    log "Headers:"
+    log $ indentLines $ show req'.headers
+
+  logResponse res = do
+    log "Returning response"
+    res.status # maybe (pure unit) (log <<< showStatus)
+    where
+    showStatus :: Status -> String
+    showStatus { code, reason } = show code <> " " <> reason
+
   indentLines = lines >>> map (\line -> "  " <> line) >>> intercalate "\n"
 
 helloWorld :: Handler
