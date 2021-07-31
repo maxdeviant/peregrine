@@ -34,8 +34,16 @@ helloWorld req = do
   pure
     $ { status: Just Status.ok
       , headers: Headers.empty # Headers.insert contentType "text/plain"
-      , writeBody: Just $ Body.write $ "Hello, world from a " <> show req.method <> "!"
+      , writeBody:
+          Just $ Body.write $ greeting req
       }
+  where
+  greeting { method, url } =
+    "Hello, world from a "
+      <> show method
+      <> " to "
+      <> url
+      <> "!"
 
 main :: Effect (Effect Unit -> Effect Unit)
 main =

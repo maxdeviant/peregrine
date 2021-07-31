@@ -38,6 +38,9 @@ parseMethod req = do
     # Method.fromString
     # note ("Invalid HTTP method: '" <> requestMethod <> "'.")
 
+parseUrl :: Http.Request -> String
+parseUrl = Http.requestURL
+
 parseHeaders :: Http.Request -> Headers
 parseHeaders = Http.requestHeaders >>> Object.foldMaybe tryInsert Headers.empty
   where
@@ -48,7 +51,11 @@ parseHeaders = Http.requestHeaders >>> Object.foldMaybe tryInsert Headers.empty
 parseRequest :: Http.Request -> Either String Request
 parseRequest req = do
   method <- req # parseMethod
-  pure { method, headers: req # parseHeaders }
+  pure
+    { method
+    , url: req # parseUrl
+    , headers: req # parseHeaders
+    }
 
 writeStatus :: Http.Response -> Status -> Effect Unit
 writeStatus res { code, reason } = do
