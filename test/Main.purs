@@ -1,9 +1,11 @@
 module Test.Main where
 
 import Prelude
+import Data.Array (intercalate)
 import Data.Maybe (Maybe(..))
+import Data.String.Utils (lines)
 import Effect (Effect)
-import Effect.Class.Console (log, logShow)
+import Effect.Class.Console (log)
 import Peregrine (Handler, Middleware)
 import Peregrine as Peregrine
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
@@ -18,19 +20,21 @@ contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
 loggingMiddleware :: Middleware
 loggingMiddleware handler req = do
   log "Received request"
+  log $ "Method: " <> show req.method
   log "Headers:"
-  logShow req.headers
-  log ""
+  log $ indentLines $ show req.headers
   response <- handler req
   log "After handler"
   pure response
+  where
+  indentLines = lines >>> map (\line -> "  " <> line) >>> intercalate "\n"
 
 helloWorld :: Handler
-helloWorld _req = do
+helloWorld req = do
   pure
     $ { status: Just Status.ok
       , headers: Headers.empty # Headers.insert contentType "text/plain"
-      , writeBody: Just $ Body.write "Hello, world!"
+      , writeBody: Just $ Body.write $ "Hello, world from a " <> show req.method <> "!"
       }
 
 main :: Effect (Effect Unit -> Effect Unit)

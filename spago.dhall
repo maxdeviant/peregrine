@@ -19,6 +19,7 @@
   , "psci-support"
   , "safe-coerce"
   , "strings"
+  , "stringutils"
   , "tuples"
   ]
 , packages = ./packages.dhall
