@@ -22,7 +22,7 @@ import Peregrine.Response (Response)
 import Peregrine.Response.Body as Body
 
 type Handler
-  = Request -> Aff Response
+  = Request -> Aff (Maybe Response)
 
 type Middleware
   = Handler -> Handler
@@ -81,20 +81,27 @@ writeResponse res response = do
 mkRequestListener :: Handler -> RequestListener
 mkRequestListener handler req res = do
   _ <-
-    runAff (\_ -> pure unit)
-      $ req
-      # parseRequest
-      # either errorHandler handler
-      >>= writeResponse res
+    runAff (\_ -> pure unit) do
+      maybeResponse <- req # parseRequest # either errorHandler handler
+      let
+        response = maybeResponse # fromMaybe notFoundResponse
+      response # writeResponse res
   pure unit
   where
-  errorHandler :: String -> Aff Response
+  notFoundResponse =
+    { status: Just Status.notFound
+    , headers: Headers.empty
+    , writeBody: Just $ Body.write Status.notFound.reason
+    }
+
+  errorHandler :: String -> Aff (Maybe Response)
   errorHandler message =
     pure
-      { status: Just Status.internalServerError
-      , headers: Headers.empty
-      , writeBody: Just $ Body.write message
-      }
+      $ pure
+          { status: Just Status.internalServerError
+          , headers: Headers.empty
+          , writeBody: Just $ Body.write message
+          }
 
 defaultListenOptions :: Http.ListenOptions
 defaultListenOptions =

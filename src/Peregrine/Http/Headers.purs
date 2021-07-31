@@ -2,6 +2,7 @@ module Peregrine.Http.Headers
   ( Headers(..)
   , empty
   , insert
+  , lookup
   , HeaderValue
   -- Re-exports
   , module HeaderName
@@ -11,6 +12,7 @@ import Prelude
 import Data.Array (intercalate)
 import Data.Map (Map, toUnfoldable)
 import Data.Map as Map
+import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype)
 import Data.Tuple (Tuple(..))
 import Peregrine.Http.Headers.HeaderName (HeaderName)
@@ -38,3 +40,6 @@ empty = Headers Map.empty
 
 insert :: HeaderName -> HeaderValue -> Headers -> Headers
 insert name value (Headers headers) = Headers $ Map.insert name value headers
+
+lookup :: HeaderName -> Headers -> Maybe HeaderValue
+lookup name (Headers headers) = headers # Map.lookup name
