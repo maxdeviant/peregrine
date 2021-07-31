@@ -18,6 +18,7 @@
   , "prelude"
   , "psci-support"
   , "safe-coerce"
+  , "spec"
   , "strings"
   , "stringutils"
   , "tuples"
