@@ -34,6 +34,8 @@ loggingMiddleware handler req = do
   logResponse res = do
     log "Returning response"
     res.status # maybe (pure unit) (log <<< showStatus)
+    log "Headers:"
+    log $ indentLines $ show res.headers
     where
     showStatus :: Status -> String
     showStatus { code, reason } = show code <> " " <> reason
