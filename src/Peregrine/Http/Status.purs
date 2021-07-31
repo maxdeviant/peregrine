@@ -1,4 +1,4 @@
-module Peregrine.Status
+module Peregrine.Http.Status
   ( Status
   -- 1xx: Information responses
   , continue

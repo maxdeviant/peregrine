@@ -8,12 +8,12 @@ import Effect.Aff (Aff, runAff)
 import Effect.Aff.Class (liftAff)
 import Effect.Class (liftEffect)
 import Node.HTTP as Http
-import Peregrine.Headers (Headers(..))
-import Peregrine.Method (Method(..))
+import Peregrine.Http.Headers (Headers(..))
+import Peregrine.Http.Method (Method(..))
+import Peregrine.Http.Status (Status)
+import Peregrine.Http.Status as Status
 import Peregrine.Request (Request)
 import Peregrine.Response (Response)
-import Peregrine.Status (Status)
-import Peregrine.Status as Status
 
 type Handler
   = Request -> Aff Response

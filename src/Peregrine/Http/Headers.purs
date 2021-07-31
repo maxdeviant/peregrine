@@ -1,4 +1,4 @@
-module Peregrine.Headers
+module Peregrine.Http.Headers
   ( Headers(..)
   , empty
   , insert
@@ -11,8 +11,8 @@ import Prelude
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Newtype (class Newtype)
-import Peregrine.Headers.HeaderName (HeaderName)
-import Peregrine.Headers.HeaderName (class MakeHeaderName, HeaderName(..), staticHeaderName) as HeaderName
+import Peregrine.Http.Headers.HeaderName (HeaderName)
+import Peregrine.Http.Headers.HeaderName (class MakeHeaderName, HeaderName(..), staticHeaderName) as HeaderName
 
 type HeaderValue
   = String

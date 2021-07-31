@@ -6,10 +6,10 @@ import Effect (Effect)
 import Effect.Class.Console (log)
 import Peregrine (Handler, Middleware)
 import Peregrine as Peregrine
-import Peregrine.Headers (HeaderName, staticHeaderName)
-import Peregrine.Headers as Headers
+import Peregrine.Http.Headers (HeaderName, staticHeaderName)
+import Peregrine.Http.Headers as Headers
+import Peregrine.Http.Status as Status
 import Peregrine.Response.Body as Body
-import Peregrine.Status as Status
 import Type.Proxy (Proxy(..))
 
 contentType :: HeaderName

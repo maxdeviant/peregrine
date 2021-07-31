@@ -1,4 +1,4 @@
-module Peregrine.Method where
+module Peregrine.Http.Method where
 
 import Prelude
 

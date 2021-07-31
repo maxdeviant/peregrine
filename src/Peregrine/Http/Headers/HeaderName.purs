@@ -1,4 +1,4 @@
-module Peregrine.Headers.HeaderName where
+module Peregrine.Http.Headers.HeaderName where
 
 import Prelude
 import Data.Newtype (class Newtype, unwrap)

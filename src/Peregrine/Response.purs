@@ -4,8 +4,8 @@ import Prelude
 import Data.Maybe (Maybe)
 import Effect.Aff (Aff)
 import Node.HTTP as Http
-import Peregrine.Headers (Headers)
-import Peregrine.Status (Status)
+import Peregrine.Http.Headers (Headers)
+import Peregrine.Http.Status (Status)
 
 -- | An HTTP response.
 type Response

@@ -1,6 +1,6 @@
 module Peregrine.Request where
 
-import Peregrine.Method (Method)
+import Peregrine.Http.Method (Method)
 
 -- | An HTTP request.
 type Request
