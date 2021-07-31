@@ -17,6 +17,9 @@ import Peregrine.Status as Status
 type Handler
   = Request -> Aff Response
 
+type Middleware
+  = Handler -> Handler
+
 type RequestListener
   = Http.Request -> Http.Response -> Effect Unit
 
