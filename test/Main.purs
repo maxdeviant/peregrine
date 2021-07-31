@@ -4,17 +4,17 @@ import Prelude
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.String.NonEmpty (nes)
-import Data.String.NonEmpty.CaseInsensitive (CaseInsensitiveNonEmptyString)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Peregrine (Handler)
 import Peregrine as Peregrine
+import Peregrine.Headers (HeaderName)
 import Peregrine.Headers as Headers
 import Peregrine.Response.Body as Body
 import Peregrine.Status as Status
 import Type.Proxy (Proxy(..))
 
-contentType :: CaseInsensitiveNonEmptyString
+contentType :: HeaderName
 contentType = wrap $ nes (Proxy :: Proxy "Content-Type")
 
 helloWorld :: Handler
