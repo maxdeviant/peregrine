@@ -1,6 +1,7 @@
 module Peregrine where
 
 import Prelude
+import Data.Either (Either, either, note)
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
@@ -9,11 +10,14 @@ import Effect.Aff.Class (liftAff)
 import Effect.Class (liftEffect)
 import Node.HTTP as Http
 import Peregrine.Http.Headers (Headers(..))
-import Peregrine.Http.Method (Method(..))
+import Peregrine.Http.Headers as Headers
+import Peregrine.Http.Method (Method)
+import Peregrine.Http.Method as Method
 import Peregrine.Http.Status (Status)
 import Peregrine.Http.Status as Status
 import Peregrine.Request (Request)
 import Peregrine.Response (Response)
+import Peregrine.Response.Body as Body
 
 type Handler
   = Request -> Aff Response
@@ -23,6 +27,19 @@ type Middleware
 
 type RequestListener
   = Http.Request -> Http.Response -> Effect Unit
+
+parseMethod :: Http.Request -> Either String Method
+parseMethod req = do
+  let
+    requestMethod = req # Http.requestMethod
+  requestMethod
+    # Method.fromString
+    # note ("Invalid HTTP method: '" <> requestMethod <> "'.")
+
+parseRequest :: Http.Request -> Either String Request
+parseRequest req = do
+  method <- req # parseMethod
+  pure { method }
 
 writeStatus :: Http.Response -> Status -> Effect Unit
 writeStatus res { code, reason } = do
@@ -46,12 +63,22 @@ writeResponse res response = do
   liftAff $ maybe (pure unit) ((#) res) response.writeBody
 
 mkRequestListener :: Handler -> RequestListener
-mkRequestListener handler _req res = do
+mkRequestListener handler req res = do
   _ <-
     runAff (\_ -> pure unit)
-      $ handler { method: Get }
+      $ req
+      # parseRequest
+      # either errorHandler handler
       >>= writeResponse res
   pure unit
+  where
+  errorHandler :: String -> Aff Response
+  errorHandler message =
+    pure
+      { status: Just Status.internalServerError
+      , headers: Headers.empty
+      , writeBody: Just $ Body.write message
+      }
 
 defaultListenOptions :: Http.ListenOptions
 defaultListenOptions =

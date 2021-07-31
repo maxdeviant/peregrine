@@ -1,6 +1,7 @@
 module Peregrine.Http.Method where
 
 import Prelude
+import Data.Maybe (Maybe(..))
 
 -- | An HTTP request method.
 data Method
@@ -27,6 +28,19 @@ instance showMethod :: Show Method where
     Trace -> "TRACE"
     Connect -> "CONNECT"
     Patch -> "PATCH"
+
+fromString :: String -> Maybe Method
+fromString = case _ of
+  "GET" -> Just Get
+  "PUT" -> Just Put
+  "POST" -> Just Post
+  "DELETE" -> Just Delete
+  "OPTIONS" -> Just Options
+  "HEAD" -> Just Head
+  "TRACE" -> Just Trace
+  "CONNECT" -> Just Connect
+  "PATCH" -> Just Patch
+  _ -> Nothing
 
 -- | Returns whether an HTTP request with the indicated method always supports
 -- | a payload.
