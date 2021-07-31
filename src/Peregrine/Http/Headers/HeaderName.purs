@@ -1,12 +1,14 @@
 module Peregrine.Http.Headers.HeaderName where
 
 import Prelude
-import Data.Newtype (class Newtype, unwrap)
+import Data.Maybe (Maybe)
+import Data.Newtype (class Newtype)
 import Data.String.NonEmpty as NonEmptyString
 import Data.String.NonEmpty.CaseInsensitive (CaseInsensitiveNonEmptyString(..))
 import Data.String.NonEmpty.Internal (NonEmptyString(..))
 import Data.Symbol (class IsSymbol, reflectSymbol)
 import Prim.TypeError as TypeError
+import Safe.Coerce (coerce)
 
 -- The name of an HTTP header.
 newtype HeaderName
@@ -19,7 +21,7 @@ derive newtype instance eqHeaderName :: Eq HeaderName
 derive newtype instance ordHeaderName :: Ord HeaderName
 
 instance showHeaderName :: Show HeaderName where
-  show = NonEmptyString.toString <<< unwrap <<< unwrap
+  show = coerce >>> NonEmptyString.toString
 
 -- | A helper class for defining header names at compile time.
 -- |
@@ -43,3 +45,6 @@ else instance makeHeaderNameGood :: IsSymbol s => MakeHeaderName s where
       $ CaseInsensitiveNonEmptyString
       $ NonEmptyString
       $ reflectSymbol proxy
+
+fromString :: String -> Maybe HeaderName
+fromString = NonEmptyString.fromString >>> map coerce

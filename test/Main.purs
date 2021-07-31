@@ -3,7 +3,7 @@ module Test.Main where
 import Prelude
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Effect.Class.Console (log)
+import Effect.Class.Console (log, logShow)
 import Peregrine (Handler, Middleware)
 import Peregrine as Peregrine
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
@@ -17,7 +17,10 @@ contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
 
 loggingMiddleware :: Middleware
 loggingMiddleware handler req = do
-  log "Received request..."
+  log "Received request"
+  log "Headers:"
+  logShow req.headers
+  log ""
   response <- handler req
   log "After handler"
   pure response

@@ -8,9 +8,11 @@ import Effect (Effect)
 import Effect.Aff (Aff, runAff)
 import Effect.Aff.Class (liftAff)
 import Effect.Class (liftEffect)
+import Foreign.Object as Object
 import Node.HTTP as Http
 import Peregrine.Http.Headers (Headers(..))
 import Peregrine.Http.Headers as Headers
+import Peregrine.Http.Headers.HeaderName as HeaderName
 import Peregrine.Http.Method (Method)
 import Peregrine.Http.Method as Method
 import Peregrine.Http.Status (Status)
@@ -36,10 +38,17 @@ parseMethod req = do
     # Method.fromString
     # note ("Invalid HTTP method: '" <> requestMethod <> "'.")
 
+parseHeaders :: Http.Request -> Headers
+parseHeaders = Http.requestHeaders >>> Object.foldMaybe tryInsert Headers.empty
+  where
+  tryInsert headers key value = do
+    name <- key # HeaderName.fromString
+    pure $ headers # Headers.insert name value
+
 parseRequest :: Http.Request -> Either String Request
 parseRequest req = do
   method <- req # parseMethod
-  pure { method }
+  pure { method, headers: req # parseHeaders }
 
 writeStatus :: Http.Response -> Status -> Effect Unit
 writeStatus res { code, reason } = do

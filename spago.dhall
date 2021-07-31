@@ -3,10 +3,12 @@
 , repository = "https://github.com/maxdeviant/peregrine"
 , dependencies =
   [ "aff"
+  , "arrays"
   , "console"
   , "effect"
   , "either"
   , "foldable-traversable"
+  , "foreign-object"
   , "maybe"
   , "newtype"
   , "node-buffer"
@@ -15,7 +17,9 @@
   , "ordered-collections"
   , "prelude"
   , "psci-support"
+  , "safe-coerce"
   , "strings"
+  , "tuples"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
