@@ -9,6 +9,7 @@ import Effect.Aff.Class (liftAff)
 import Effect.Class (liftEffect)
 import Node.HTTP as Http
 import Peregrine.Headers (Headers(..))
+import Peregrine.Method (Method(..))
 import Peregrine.Request (Request)
 import Peregrine.Response (Response)
 import Peregrine.Status (Status)
@@ -48,7 +49,7 @@ mkRequestListener :: Handler -> RequestListener
 mkRequestListener handler _req res = do
   _ <-
     runAff (\_ -> pure unit)
-      $ handler { method: "GET" }
+      $ handler { method: Get }
       >>= writeResponse res
   pure unit
 
