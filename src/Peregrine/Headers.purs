@@ -1,13 +1,18 @@
-module Peregrine.Headers where
+module Peregrine.Headers
+  ( Headers(..)
+  , empty
+  , insert
+  , HeaderValue
+  -- Re-exports
+  , module HeaderName
+  ) where
 
 import Prelude
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Newtype (class Newtype)
-import Data.String.NonEmpty.CaseInsensitive (CaseInsensitiveNonEmptyString)
-
-type HeaderName
-  = CaseInsensitiveNonEmptyString
+import Peregrine.Headers.HeaderName (HeaderName)
+import Peregrine.Headers.HeaderName (class MakeHeaderName, HeaderName(..), staticHeaderName) as HeaderName
 
 type HeaderValue
   = String

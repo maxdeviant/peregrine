@@ -2,8 +2,6 @@ module Peregrine where
 
 import Prelude
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
-import Data.Newtype (unwrap)
-import Data.String.NonEmpty as NonEmptyString
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
 import Effect.Aff (Aff, runAff)
@@ -33,7 +31,7 @@ writeHeaders res (Headers headers) =
   void
     $ traverseWithIndex setHeader headers
   where
-  setHeader key value = Http.setHeader res (NonEmptyString.toString $ unwrap key) value
+  setHeader key value = Http.setHeader res (show key) value
 
 writeResponse :: Http.Response -> Response -> Aff Unit
 writeResponse res response = do
