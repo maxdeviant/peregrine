@@ -2,8 +2,10 @@
 , license = "MIT"
 , repository = "https://github.com/maxdeviant/peregrine"
 , dependencies =
-  [ "console"
+  [ "aff"
+  , "console"
   , "effect"
+  , "either"
   , "foldable-traversable"
   , "maybe"
   , "newtype"

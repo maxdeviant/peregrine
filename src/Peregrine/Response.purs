@@ -1,6 +1,9 @@
 module Peregrine.Response where
 
+import Prelude
 import Data.Maybe (Maybe)
+import Effect.Aff (Aff)
+import Node.HTTP as Http
 import Peregrine.Headers (Headers)
 import Peregrine.Status (Status)
 
@@ -8,5 +11,5 @@ import Peregrine.Status (Status)
 type Response
   = { status :: Maybe Status
     , headers :: Headers
-    , body :: Maybe String
+    , writeBody :: Maybe (Http.Response -> Aff Unit)
     }

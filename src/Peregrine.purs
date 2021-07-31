@@ -1,25 +1,23 @@
 module Peregrine where
 
 import Prelude
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Newtype (unwrap, wrap)
-import Data.String.NonEmpty (nes)
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Newtype (unwrap)
 import Data.String.NonEmpty as NonEmptyString
-import Data.String.NonEmpty.CaseInsensitive (CaseInsensitiveNonEmptyString)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
-import Node.Encoding (Encoding(..))
+import Effect.Aff (Aff, runAff)
+import Effect.Aff.Class (liftAff)
+import Effect.Class (liftEffect)
 import Node.HTTP as Http
-import Node.Stream as Stream
 import Peregrine.Headers (Headers(..))
-import Peregrine.Headers as Headers
+import Peregrine.Request (Request)
 import Peregrine.Response (Response)
 import Peregrine.Status (Status)
 import Peregrine.Status as Status
-import Type.Proxy (Proxy(..))
 
-contentType :: CaseInsensitiveNonEmptyString
-contentType = wrap $ nes (Proxy :: Proxy "Content-Type")
+type Handler
+  = Request -> Aff Response
 
 type RequestListener
   = Http.Request -> Http.Response -> Effect Unit
@@ -37,28 +35,21 @@ writeHeaders res (Headers headers) =
   where
   setHeader key value = Http.setHeader res (NonEmptyString.toString $ unwrap key) value
 
-writeResponse :: Http.Response -> Response -> Effect Unit
+writeResponse :: Http.Response -> Response -> Aff Unit
 writeResponse res response = do
   let
     status = response.status # fromMaybe Status.ok
-  _ <- writeStatus res status
-  _ <- writeHeaders res response.headers
-  pure unit
+  liftEffect $ writeStatus res status
+  liftEffect $ writeHeaders res response.headers
+  liftAff $ maybe (pure unit) ((#) res) response.writeBody
 
-mkRequestListener :: RequestListener
-mkRequestListener _req res = do
-  let
-    response =
-      { status: Just Status.ok
-      , headers: Headers.empty # Headers.insert contentType "text/plain"
-      , body: Nothing
-      }
-  _ <- writeResponse res response
-  let
-    responseStream = res # Http.responseAsStream
+mkRequestListener :: Handler -> RequestListener
+mkRequestListener handler _req res = do
   _ <-
-    Stream.writeString responseStream UTF8 "Hello, world!" mempty
-  Stream.end responseStream mempty
+    runAff (\_ -> pure unit)
+      $ handler { method: "GET" }
+      >>= writeResponse res
+  pure unit
 
 defaultListenOptions :: Http.ListenOptions
 defaultListenOptions =
@@ -67,8 +58,8 @@ defaultListenOptions =
   , backlog: Nothing
   }
 
-fly :: Effect Unit -> Effect (Effect Unit -> Effect Unit)
-fly callback = do
-  server <- Http.createServer mkRequestListener
+fly :: Handler -> Effect Unit -> Effect (Effect Unit -> Effect Unit)
+fly handler callback = do
+  server <- Http.createServer $ mkRequestListener handler
   Http.listen server defaultListenOptions callback
   pure $ Http.close server
