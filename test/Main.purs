@@ -28,4 +28,4 @@ helloWorld _req = do
 main :: Effect (Effect Unit -> Effect Unit)
 main =
   Peregrine.fly helloWorld do
-    log "Peregrine server listing at http://localhost:3000"
+    log "Peregrine server listening at http://localhost:3000"
