@@ -6,7 +6,7 @@ import Data.Maybe (Maybe(..), maybe)
 import Data.String.Utils (lines)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Peregrine (Handler, Middleware)
+import Peregrine (Handler, Middleware, choose)
 import Peregrine as Peregrine
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
 import Peregrine.Http.Headers as Headers
@@ -15,6 +15,13 @@ import Peregrine.Http.Status as Status
 import Peregrine.Response (Response)
 import Peregrine.Response.Body as Body
 import Type.Proxy (Proxy(..))
+
+route :: String -> Handler -> Handler
+route path next req =
+  if req.url == path then
+    next req
+  else
+    pure Nothing
 
 contentType :: HeaderName
 contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
@@ -62,7 +69,7 @@ requireAuthorization handler req = do
     }
 
 helloWorld :: Handler
-helloWorld req = do
+helloWorld req =
   pure $ pure
     $ { status: Just Status.ok
       , headers: Headers.empty # Headers.insert contentType "text/plain"
@@ -77,9 +84,27 @@ helloWorld req = do
       <> url
       <> "!"
 
+admin :: Handler
+admin _req =
+  pure
+    $ Just
+        { status: Just Status.ok
+        , headers: Headers.empty
+        , writeBody: Just $ Body.write $ "Welcome to the admin panel."
+        }
+
+app :: Handler
+app =
+  choose
+    [ route "/" $ helloWorld
+    , route
+        "/admin"
+        $ requireAuthorization admin
+    ]
+
 main :: Effect (Effect Unit -> Effect Unit)
 main =
-  Peregrine.fly app do
+  Peregrine.fly app' do
     log "Peregrine server listening at http://localhost:3000"
   where
-  app = loggingMiddleware <<< requireAuthorization $ helloWorld
+  app' = loggingMiddleware app

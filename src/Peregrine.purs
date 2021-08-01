@@ -1,6 +1,7 @@
 module Peregrine where
 
 import Prelude
+import Data.Array (uncons)
 import Data.Either (Either, either, note)
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.TraversableWithIndex (traverseWithIndex)
@@ -29,6 +30,16 @@ type Middleware
 
 type RequestListener
   = Http.Request -> Http.Response -> Effect Unit
+
+choose :: Array Handler -> Handler
+choose handlers req = do
+  case uncons handlers of
+    Just { head, tail } -> do
+      maybeRes <- req # head
+      case maybeRes of
+        Just res -> pure $ Just res
+        Nothing -> choose tail req
+    Nothing -> pure Nothing
 
 parseMethod :: Http.Request -> Either String Method
 parseMethod req = do
