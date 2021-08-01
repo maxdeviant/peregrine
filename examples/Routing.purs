@@ -10,6 +10,7 @@ import Peregrine.Http.Headers (staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Http.Status as Status
+import Peregrine.Response as Response
 import Peregrine.Response.Body as Body
 import Peregrine.Routing (header, method, path, pathPrefix)
 import Type.Proxy (Proxy(..))
@@ -18,10 +19,8 @@ makeUserHandler :: String -> Handler
 makeUserHandler title _req =
   pure
     $ Just
-        { status: Just Status.ok
-        , headers: Headers.empty
-        , writeBody: Just $ Body.write title
-        }
+    $ Response.ok
+    # Response.withBody title
 
 listUsers :: Handler
 listUsers = makeUserHandler "List Users"
@@ -69,10 +68,8 @@ secretArea =
       message = "Welcome to the secret area, " <> show team <> " Spy."
     pure
       $ Just
-          { status: Just Status.ok
-          , headers: Headers.empty
-          , writeBody: Just $ Body.write message
-          }
+      $ Response.ok
+      # Response.withBody message
   where
   secretHeader = staticHeaderName (Proxy :: Proxy "X-Secret-Code")
 

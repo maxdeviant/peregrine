@@ -11,9 +11,7 @@ import Peregrine as Peregrine
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Status (Status)
-import Peregrine.Http.Status as Status
-import Peregrine.Response (Response)
-import Peregrine.Response.Body as Body
+import Peregrine.Response as Response
 import Type.Proxy (Proxy(..))
 
 route :: String -> Handler -> Handler
@@ -58,26 +56,17 @@ requireAuthorization handler req = do
     authorizationValue = req.headers # Headers.lookup authorization
   case authorizationValue of
     Just "Bearer open_sesame" -> handler req
-    Just _ -> pure $ Just unauthorized
-    Nothing -> pure $ Just unauthorized
+    Just _ -> pure $ Just Response.unauthorized
+    Nothing -> pure $ Just Response.unauthorized
   where
   authorization = staticHeaderName (Proxy :: Proxy "Authorization")
 
-  unauthorized :: Response
-  unauthorized =
-    { status: Just Status.unauthorized
-    , headers: Headers.empty
-    , writeBody: Just $ Body.write Status.unauthorized.reason
-    }
-
 helloWorld :: Handler
 helloWorld req =
-  pure $ pure
-    $ { status: Just Status.ok
-      , headers: Headers.empty # Headers.insert contentType "text/plain"
-      , writeBody:
-          Just $ Body.write $ greeting req
-      }
+  pure $ Just
+    $ Response.ok
+    # Response.addHeader contentType "text/plain"
+    # Response.withBody (greeting req)
   where
   greeting { method, url } =
     "Hello, world from a "
@@ -88,12 +77,9 @@ helloWorld req =
 
 admin :: Handler
 admin _req =
-  pure
-    $ Just
-        { status: Just Status.ok
-        , headers: Headers.empty
-        , writeBody: Just $ Body.write $ "Welcome to the admin panel."
-        }
+  pure $ Just
+    $ Response.ok
+    # Response.withBody "Welcome to the admin panel."
 
 app :: Handler
 app =

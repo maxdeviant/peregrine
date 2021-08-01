@@ -7,7 +7,7 @@ import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Http.Status as Status
 import Peregrine.Request (Request)
-import Peregrine.Response (Response)
+import Peregrine.Response as Response
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
@@ -28,18 +28,11 @@ peregrineSpec = do
         isNothing result `shouldEqual` true
     describe "given a list of handlers" do
       it "returns the first Just response" do
-        let
-          emptyResponse =
-            { status: Nothing
-            , headers: Headers.empty
-            , writeBody: Nothing
-            } ::
-              Response
         result <-
           choose
             [ \_req -> pure $ Nothing
-            , \_req -> pure $ Just emptyResponse { status = Just Status.ok }
-            , \_req -> pure $ Just emptyResponse { status = Just Status.unauthorized }
+            , \_req -> pure $ Just $ Response.ok
+            , \_req -> pure $ Just $ Response.unauthorized
             ]
             req
         (result >>= _.status) `shouldEqual` Just Status.ok

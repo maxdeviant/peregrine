@@ -26,7 +26,7 @@ import Peregrine.Http.Status (Status)
 import Peregrine.Http.Status as Status
 import Peregrine.Request (Request)
 import Peregrine.Response (Response)
-import Peregrine.Response.Body as Body
+import Peregrine.Response as Response
 
 type Handler
   = Request -> Aff (Maybe Response)
@@ -104,24 +104,16 @@ mkRequestListener handler req res = do
     runAff (\_ -> pure unit) do
       maybeResponse <- req # parseRequest # either errorHandler handler
       let
-        response = maybeResponse # fromMaybe notFoundResponse
+        response = maybeResponse # fromMaybe Response.notFound
       response # writeResponse res
   pure unit
   where
-  notFoundResponse =
-    { status: Just Status.notFound
-    , headers: Headers.empty
-    , writeBody: Just $ Body.write Status.notFound.reason
-    }
-
   errorHandler :: String -> Aff (Maybe Response)
   errorHandler message =
     pure
-      $ pure
-          { status: Just Status.internalServerError
-          , headers: Headers.empty
-          , writeBody: Just $ Body.write message
-          }
+      $ Just
+      $ Response.internalServerError
+      # Response.withBody message
 
 defaultListenOptions :: Http.ListenOptions
 defaultListenOptions =
