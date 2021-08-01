@@ -3,8 +3,6 @@ module Peregrine.Routing where
 import Prelude
 import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), stripPrefix)
-import Effect.Class (liftEffect)
-import Effect.Console (log)
 import Peregrine (Handler)
 import Peregrine.Http.Headers (HeaderName, HeaderValue)
 import Peregrine.Http.Headers as Headers
@@ -19,7 +17,6 @@ method method' next req = do
 
 path :: String -> Handler -> Handler
 path path' next req = do
-  liftEffect $ log $ "Checking " <> req.path <> " == " <> path'
   if req.path == path' then
     next req
   else
