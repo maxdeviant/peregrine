@@ -6,11 +6,13 @@ import Effect (Effect)
 import Effect.Console (log)
 import Peregrine (Handler, choose)
 import Peregrine as Peregrine
+import Peregrine.Http.Headers (staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Http.Status as Status
 import Peregrine.Response.Body as Body
-import Peregrine.Routing (method, path, pathPrefix)
+import Peregrine.Routing (header, method, path, pathPrefix)
+import Type.Proxy (Proxy(..))
 
 makeUserHandler :: String -> Handler
 makeUserHandler title _req =
@@ -52,10 +54,40 @@ usersController =
             ]
     ]
 
+data Team
+  = Red
+  | Blu
+
+instance showTeam :: Show Team where
+  show Red = "RED"
+  show Blu = "BLU"
+
+secretArea :: Handler
+secretArea =
+  secretHeaderGuard \team _req -> do
+    let
+      message = "Welcome to the secret area, " <> show team <> " Spy."
+    pure
+      $ Just
+          { status: Just Status.ok
+          , headers: Headers.empty
+          , writeBody: Just $ Body.write message
+          }
+  where
+  secretHeader = staticHeaderName (Proxy :: Proxy "X-Secret-Code")
+
+  teamFromCode = case _ of
+    "RED" -> Just Red
+    "BLU" -> Just Blu
+    _ -> Nothing
+
+  secretHeaderGuard = header secretHeader teamFromCode
+
 app :: Handler
 app =
   choose
-    [ pathPrefix "/users" usersController
+    [ secretArea
+    , pathPrefix "/users" usersController
     ]
 
 main :: Effect (Effect Unit -> Effect Unit)
