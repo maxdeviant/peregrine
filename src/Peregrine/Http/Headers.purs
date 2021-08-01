@@ -1,6 +1,7 @@
 module Peregrine.Http.Headers
   ( Headers(..)
   , empty
+  , singleton
   , insert
   , lookup
   , HeaderValue
@@ -35,8 +36,16 @@ instance showHeaders :: Show Headers where
     where
     showHeader (Tuple name value) = show name <> ": " <> value
 
+derive newtype instance eqHeaders :: Eq Headers
+
+instance semigroupHeaders :: Semigroup Headers where
+  append (Headers headers) (Headers headers') = Headers $ Map.union headers' headers
+
 empty :: Headers
 empty = Headers Map.empty
+
+singleton :: HeaderName -> HeaderValue -> Headers
+singleton name value = Headers $ Map.singleton name value
 
 insert :: HeaderName -> HeaderValue -> Headers -> Headers
 insert name value (Headers headers) = Headers $ Map.insert name value headers
