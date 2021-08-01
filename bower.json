@@ -1,0 +1,38 @@
+{
+    "name": "purescript-peregrine",
+    "license": [
+        "MIT"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/maxdeviant/peregrine"
+    },
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "output"
+    ],
+    "dependencies": {
+        "purescript-aff": "^v6.0.0",
+        "purescript-arrays": "^v6.0.1",
+        "purescript-console": "^v5.0.0",
+        "purescript-effect": "^v3.0.0",
+        "purescript-either": "^v5.0.0",
+        "purescript-foldable-traversable": "^v5.0.1",
+        "purescript-foreign-object": "^v3.0.0",
+        "purescript-maybe": "^v5.0.0",
+        "purescript-newtype": "^v4.0.0",
+        "purescript-node-buffer": "^v7.0.1",
+        "purescript-node-http": "^v6.0.0",
+        "purescript-node-streams": "^v5.0.0",
+        "purescript-ordered-collections": "^v2.0.1",
+        "purescript-prelude": "^v5.0.1",
+        "purescript-psci-support": "^v5.0.0",
+        "purescript-safe-coerce": "^v1.0.0",
+        "purescript-spec": "^v5.0.1",
+        "purescript-strings": "^v5.0.0",
+        "purescript-stringutils": "^v0.0.11",
+        "purescript-tuples": "^v6.0.1"
+    }
+}
