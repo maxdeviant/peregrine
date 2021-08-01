@@ -7,11 +7,8 @@ import Effect.Console (log)
 import Peregrine (Handler, choose)
 import Peregrine as Peregrine
 import Peregrine.Http.Headers (staticHeaderName)
-import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
-import Peregrine.Http.Status as Status
 import Peregrine.Response as Response
-import Peregrine.Response.Body as Body
 import Peregrine.Routing (header, method, path, pathPrefix)
 import Type.Proxy (Proxy(..))
 
