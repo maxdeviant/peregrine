@@ -90,6 +90,8 @@ type Response
     , writeBody :: Maybe (Http.Response -> Aff Unit)
     }
 
+-- | Constructs a response from the specified HTTP status, using the status'
+-- | reason phrase as the response body.
 fromStatus :: Status -> Response
 fromStatus status =
   { status: Just status
