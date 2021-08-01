@@ -7,5 +7,6 @@ import Peregrine.Http.Method (Method)
 type Request
   = { method :: Method
     , url :: String
+    , path :: String
     , headers :: Headers
     }

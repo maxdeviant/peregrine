@@ -18,6 +18,7 @@ peregrineSpec = do
       req =
         { method: Get
         , url: "/"
+        , path: "/"
         , headers: Headers.empty
         } ::
           Request

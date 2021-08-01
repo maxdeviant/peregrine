@@ -1,9 +1,10 @@
 module Peregrine where
 
 import Prelude
-import Data.Array (uncons)
+import Data.Array (head, uncons)
 import Data.Either (Either, either, note)
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.String (Pattern(..), split)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
 import Effect.Aff (Aff, runAff)
@@ -62,9 +63,12 @@ parseHeaders = Http.requestHeaders >>> Object.foldMaybe tryInsert Headers.empty
 parseRequest :: Http.Request -> Either String Request
 parseRequest req = do
   method <- req # parseMethod
+  let
+    url = req # parseUrl
   pure
     { method
-    , url: req # parseUrl
+    , url
+    , path: url # split (Pattern "?") >>> head >>> fromMaybe ""
     , headers: req # parseHeaders
     }
 

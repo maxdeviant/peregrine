@@ -36,6 +36,8 @@ loggingMiddleware handler req = do
   logRequest req' = do
     log "Received request"
     log $ "Method: " <> show req'.method
+    log $ "URL: " <> req'.url
+    log $ "Path: " <> req'.path
     log "Headers:"
     log $ indentLines $ show req'.headers
 
