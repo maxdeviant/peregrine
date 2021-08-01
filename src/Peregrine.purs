@@ -1,4 +1,9 @@
-module Peregrine where
+module Peregrine
+  ( Handler
+  , Middleware
+  , choose
+  , fly
+  ) where
 
 import Prelude
 import Data.Array (head, uncons)
