@@ -12,14 +12,8 @@ import Peregrine.Http.Headers (HeaderName, staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Status (Status)
 import Peregrine.Response as Response
+import Peregrine.Routing (path)
 import Type.Proxy (Proxy(..))
-
-route :: String -> Handler -> Handler
-route path next req =
-  if req.url == path then
-    next req
-  else
-    pure Nothing
 
 contentType :: HeaderName
 contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
@@ -84,8 +78,8 @@ admin _req =
 app :: Handler
 app =
   choose
-    [ route "/" $ helloWorld
-    , route
+    [ path "/" $ helloWorld
+    , path
         "/admin"
         $ requireAuthorization admin
     ]
