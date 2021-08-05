@@ -1,12 +1,22 @@
 module Peregrine.Routing where
 
 import Prelude
+import Data.Array as Array
+import Data.Array.NonEmpty as NonEmptyArray
+import Data.Either (Either(..))
+import Data.Map (Map)
+import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), stripPrefix)
+import Data.String (Pattern(..), Replacement(..), stripPrefix)
+import Data.String as String
+import Data.String.Regex as Regex
+import Data.String.Regex.Flags (noFlags)
+import Data.Tuple (Tuple(..))
 import Peregrine (Handler)
 import Peregrine.Http.Headers (HeaderName, HeaderValue)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method)
+import Peregrine.Response as Response
 
 method :: Method -> Handler -> Handler
 method method' next req = do
@@ -21,6 +31,49 @@ path path' next req = do
     next req
   else
     pure Nothing
+
+pathParams :: forall params. String -> (Map String String -> Maybe params) -> (params -> Handler) -> Handler
+pathParams path' parseParams next req = do
+  case Regex.regex pattern noFlags of
+    Right regex -> case Regex.match regex req.path of
+      Just matches ->
+        let
+          matchesWithGroupNames = Array.zip groupNames (NonEmptyArray.toArray matches)
+
+          params =
+            matchesWithGroupNames
+              # Array.mapMaybe
+                  ( \(Tuple name match) ->
+                      match
+                        # map \match' -> Tuple name match'
+                  )
+              # Map.fromFoldable
+              # parseParams
+        in
+          case params of
+            Just params' -> next params' req
+            Nothing -> pure Nothing
+      Nothing -> pure Nothing
+    Left error ->
+      pure
+        $ Just
+        $ Response.internalServerError
+        # Response.withBody error
+  where
+  groupNames =
+    path'
+      # String.split (Pattern "/")
+      # Array.filter (String.contains (Pattern "<"))
+      # map
+          ( String.replace (Pattern "<") (Replacement "")
+              >>> String.replace (Pattern ">") (Replacement "")
+          )
+
+  pattern =
+    path'
+      # String.replaceAll (Pattern "<") (Replacement "(?<")
+      # String.replaceAll (Pattern ">") (Replacement ">[^/\n]+)")
+      # (\p -> "^" <> p <> "$")
 
 pathPrefix :: String -> Handler -> Handler
 pathPrefix prefix next req = do

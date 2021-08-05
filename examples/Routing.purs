@@ -1,6 +1,8 @@
 module Examples.Routing where
 
 import Prelude
+import Data.Map (Map)
+import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Console (log)
@@ -9,7 +11,7 @@ import Peregrine as Peregrine
 import Peregrine.Http.Headers (staticHeaderName)
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Response as Response
-import Peregrine.Routing (header, method, path, pathPrefix)
+import Peregrine.Routing (header, method, path, pathParams, pathPrefix)
 import Type.Proxy (Proxy(..))
 
 makeUserHandler :: String -> Handler
@@ -25,14 +27,25 @@ listUsers = makeUserHandler "List Users"
 createUser :: Handler
 createUser = makeUserHandler "Create User"
 
-getUser :: Handler
-getUser = makeUserHandler "Get User"
+type UserId
+  = String
 
-updateUser :: Handler
-updateUser = makeUserHandler "Update User"
+getUser :: UserId -> Handler
+getUser id = makeUserHandler $ "Get User " <> id
 
-deleteUser :: Handler
-deleteUser = makeUserHandler "Delete User"
+updateUser :: UserId -> Handler
+updateUser id = makeUserHandler $ "Update User " <> id
+
+deleteUser :: UserId -> Handler
+deleteUser id = makeUserHandler $ "Delete User " <> id
+
+type UserParams
+  = { id :: UserId }
+
+parseUserParams :: Map String String -> Maybe UserParams
+parseUserParams params = do
+  id <- params # Map.lookup "id"
+  pure { id }
 
 usersController :: Handler
 usersController =
@@ -42,12 +55,12 @@ usersController =
             [ method Get listUsers
             , method Post createUser
             ]
-    , path "/:id"
-        $ choose
-            [ method Get getUser
-            , method Put updateUser
-            , method Delete deleteUser
-            ]
+    , pathParams "/<id>" parseUserParams \{ id } ->
+        choose
+          [ method Get $ getUser id
+          , method Put $ updateUser id
+          , method Delete $ deleteUser id
+          ]
     ]
 
 data Team
