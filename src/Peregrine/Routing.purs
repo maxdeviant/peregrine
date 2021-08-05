@@ -38,7 +38,9 @@ pathParams path' parseParams next req = do
     Right regex -> case Regex.match regex req.path of
       Just matches ->
         let
-          matchesWithGroupNames = Array.zip groupNames $ NonEmptyArray.drop 1 matches
+          matchesWithGroupNames =
+            Array.zip groupNames
+              $ NonEmptyArray.drop 1 matches
 
           params =
             matchesWithGroupNames
