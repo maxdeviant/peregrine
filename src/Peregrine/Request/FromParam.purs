@@ -32,14 +32,14 @@ instance fromParamBoolean :: FromParam Boolean where
 instance fromParamNonEmptyString :: FromParam NonEmptyString where
   fromParam param = NonEmptyString.fromString >>> note param $ param
 
-instance fromParamMaybe :: (FromParam a) => FromParam (Maybe a) where
+instance fromParamMaybe :: FromParam a => FromParam (Maybe a) where
   fromParam =
     fromParam
       >>> case _ of
           Right value -> Right $ Just value
           Left _ -> Right Nothing
 
-instance fromParamEither :: (FromParam a) => FromParam (Either String a) where
+instance fromParamEither :: FromParam a => FromParam (Either String a) where
   fromParam =
     fromParam
       >>> case _ of
