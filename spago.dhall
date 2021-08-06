@@ -5,7 +5,6 @@
   [ "aff"
   , "arrays"
   , "console"
-  , "debug"
   , "effect"
   , "either"
   , "foldable-traversable"
