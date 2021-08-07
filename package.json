@@ -13,6 +13,6 @@
     "bump-version": "purlin bump-version"
   },
   "devDependencies": {
-    "purlin": "^0.1.8"
+    "purlin": "^0.2.0"
   }
 }

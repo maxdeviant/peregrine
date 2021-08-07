@@ -46,7 +46,7 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bower@^1.8.8:
+bower@^1.8.12:
   version "1.8.12"
   resolved "https://registry.yarnpkg.com/bower/-/bower-1.8.12.tgz#44cfca2a5e04b8d9a066621e24c8b179d8ac321e"
   integrity sha512-u1xy9SrwwoPlgjuHNjhV+YUPVdqyBj2ALBxuzeIUKXaPI2i2xypGgxqXkuHcITGdi5yBj5JuXgyMvgiWiS1S3Q==
@@ -276,7 +276,7 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
-prettier@^2.2.1:
+prettier@^2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.3.2.tgz#ef280a05ec253712e486233db5c6f23441e7342d"
   integrity sha512-lnJzDfJ66zkMy58OL5/NY5zp70S7Nz6KqcKkXYzn2tMVrNxvbqaBpg7H3qHaLxCJ5lNMsGuM8+ohS7cZrthdLQ==
@@ -291,22 +291,22 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-purlin@^0.1.8:
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/purlin/-/purlin-0.1.9.tgz#b65aa7bd59829be11a4c238cfa1c506373a57148"
-  integrity sha512-fyWt+C2u+vkpr0Iedbq9C0p1QY5oicdjayhOsXKriePuRcRaeNNtksNER+lTrJ7VV6pt9vTJBlHNd+tOt2xCHA==
+purlin@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/purlin/-/purlin-0.2.0.tgz#812d017c0709f84be6f25de91ea78d8007d1f8b3"
+  integrity sha512-6eVY2kOsEmT8UVO21Zh0+5twibHhGsfpukblihQRYhhmItZTTZZUV7DvjCvS31Ej06Id13weKMUWdQTmCgbV+Q==
   dependencies:
-    bower "^1.8.8"
+    bower "^1.8.12"
     cross-spawn "^7.0.3"
-    prettier "^2.2.1"
-    purty "^6.3.0"
-    spago "^0.18.1"
+    prettier "^2.3.2"
+    purty "^7.0.0"
+    spago "^0.20.3"
     which "^2.0.2"
 
-purty@^6.3.0:
-  version "6.3.1"
-  resolved "https://registry.yarnpkg.com/purty/-/purty-6.3.1.tgz#73531f7156b8a0f7738544e22fb5a48e5acd5dde"
-  integrity sha512-KfOSejzz4PExqRwhRuLIJoggKY+cCVLGt+fB4csiyEv3ATX0IB93udl66UW4ZVj/zNJ4Ds+FK9nLfEXcNwBo5A==
+purty@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/purty/-/purty-7.0.0.tgz#3a714a2155f543118c6831e1fb41b84d17de2b59"
+  integrity sha512-gHHghPEjRY39GUJ8KnOMRfPArJILGCXwEhX6BmEdNiLgZuCjLLBLyawGiKFjYMfy8H5Dsk5NbgwIGslrPrernA==
 
 qs@~6.5.2:
   version "6.5.2"
@@ -361,10 +361,10 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-spago@^0.18.1:
-  version "0.18.1"
-  resolved "https://registry.yarnpkg.com/spago/-/spago-0.18.1.tgz#28e1dac141431d3370de55517803a1ab6651223c"
-  integrity sha512-pyxYQbtOxKZdUC9iQ0hcbtP/rJz09OwVcE22RI46+YVbLxK/80tVUrCTSQXGeG87YzQopc7bfqkY+lEXdfje1w==
+spago@^0.20.3:
+  version "0.20.3"
+  resolved "https://registry.yarnpkg.com/spago/-/spago-0.20.3.tgz#f72a096456f580f6eb64fc850c371f8cb97b139f"
+  integrity sha512-R4CWLP5IbaWoNIpS1QAUuDK2LKlKYqT5gBKVZL7ILilvCwdwS72u3NbGZbvx7VCRRZz4lG7zXUkqKNow7zh6wQ==
   dependencies:
     request "^2.88.0"
     tar "^4.4.8"
