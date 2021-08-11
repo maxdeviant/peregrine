@@ -13,7 +13,7 @@ import Node.Stream as Stream
 class Body b where
   write :: b -> Http.Response -> Aff Unit
 
-instance stringBuffer :: Body String where
+instance bodyString :: Body String where
   write body res = do
     buffer :: Buffer <- liftEffect $ Buffer.fromString body UTF8
     res # write buffer
