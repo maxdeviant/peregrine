@@ -40,9 +40,6 @@ updateUser (UserId id) = makeUserHandler $ "Update User " <> id
 deleteUser :: UserId -> Handler
 deleteUser (UserId id) = makeUserHandler $ "Delete User " <> id
 
-newtype UserParams
-  = UserParams { id :: UserId }
-
 usersController :: Handler
 usersController =
   choose
