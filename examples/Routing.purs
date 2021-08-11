@@ -1,8 +1,6 @@
 module Examples.Routing where
 
 import Prelude
-import Data.Map (Map)
-import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Console (log)
