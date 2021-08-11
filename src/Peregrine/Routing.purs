@@ -32,8 +32,11 @@ path path' next req = do
   else
     pure Nothing
 
-pathParams :: forall params. String -> (Map String String -> Maybe params) -> (params -> Handler) -> Handler
-pathParams path' parseParams next req = do
+class FromParams a where
+  fromParams :: Map String String -> Maybe a
+
+pathParams :: forall params. FromParams params => String -> (params -> Handler) -> Handler
+pathParams path' next req = do
   case Regex.regex pattern noFlags of
     Right regex -> case Regex.match regex req.path of
       Just matches ->
@@ -50,7 +53,7 @@ pathParams path' parseParams next req = do
                         # map \match' -> Tuple name match'
                   )
               # Map.fromFoldable
-              # parseParams
+              # fromParams
         in
           case params of
             Just params' -> next params' req

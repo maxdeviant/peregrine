@@ -8,10 +8,30 @@ import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Request (Request)
 import Peregrine.Response as Response
-import Peregrine.Routing (pathParams)
+import Peregrine.Routing (class FromParams, pathParams)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Type.Proxy (Proxy(..))
+
+newtype IdParams
+  = IdParams { id :: String }
+
+instance fromParamsIdParams :: FromParams IdParams where
+  fromParams params = do
+    id <- params # Map.lookup "id"
+    Just $ IdParams { id }
+
+newtype NameParams
+  = NameParams
+  { firstName :: String
+  , lastName :: String
+  }
+
+instance fromParamsNameParams :: FromParams NameParams where
+  fromParams params = do
+    firstName <- params # Map.lookup "firstName"
+    lastName <- params # Map.lookup "lastName"
+    Just $ NameParams { firstName, lastName }
 
 routingSpec :: Spec Unit
 routingSpec = do
@@ -23,10 +43,6 @@ routingSpec = do
             xId :: HeaderName
             xId = staticHeaderName (Proxy :: Proxy "X-ID")
 
-            parseParams params = do
-              id <- params # Map.lookup "id"
-              Just { id }
-
             req =
               { method: Get
               , url: "/123"
@@ -36,7 +52,7 @@ routingSpec = do
                 Request
           result <-
             req
-              # pathParams "/<id>" parseParams \{ id } _req ->
+              # pathParams "/<id>" \(IdParams { id }) _req ->
                   pure $ Just $ Response.ok # Response.addHeader xId id
           (result # map _.headers >>= Headers.lookup xId) `shouldEqual` Just "123"
       describe "given a valid path with two parameters" do
@@ -48,11 +64,6 @@ routingSpec = do
             xLastName :: HeaderName
             xLastName = staticHeaderName (Proxy :: Proxy "X-Last-Name")
 
-            parseParams params = do
-              firstName <- params # Map.lookup "firstName"
-              lastName <- params # Map.lookup "lastName"
-              Just { firstName, lastName }
-
             req =
               { method: Get
               , url: "/john/smith"
@@ -62,7 +73,7 @@ routingSpec = do
                 Request
           result <-
             req
-              # pathParams "/<firstName>/<lastName>" parseParams \{ firstName, lastName } _req ->
+              # pathParams "/<firstName>/<lastName>" \(NameParams { firstName, lastName }) _req ->
                   pure $ Just
                     $ Response.ok
                     # Response.addHeader xFirstName firstName

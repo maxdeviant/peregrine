@@ -11,7 +11,7 @@ import Peregrine as Peregrine
 import Peregrine.Http.Headers (staticHeaderName)
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Response as Response
-import Peregrine.Routing (header, method, path, pathParams, pathPrefix)
+import Peregrine.Routing (class FromParams, header, method, path, pathParams, pathPrefix)
 import Type.Proxy (Proxy(..))
 
 makeUserHandler :: String -> Handler
@@ -39,13 +39,13 @@ updateUser id = makeUserHandler $ "Update User " <> id
 deleteUser :: UserId -> Handler
 deleteUser id = makeUserHandler $ "Delete User " <> id
 
-type UserParams
-  = { id :: UserId }
+newtype UserParams
+  = UserParams { id :: UserId }
 
-parseUserParams :: Map String String -> Maybe UserParams
-parseUserParams params = do
-  id <- params # Map.lookup "id"
-  pure { id }
+instance fromParamsUserParams :: FromParams UserParams where
+  fromParams params = do
+    id <- params # Map.lookup "id"
+    pure $ UserParams { id }
 
 usersController :: Handler
 usersController =
@@ -55,7 +55,7 @@ usersController =
             [ method Get listUsers
             , method Post createUser
             ]
-    , pathParams "/<id>" parseUserParams \{ id } ->
+    , pathParams "/<id>" \(UserParams { id }) ->
         choose
           [ method Get $ getUser id
           , method Put $ updateUser id
