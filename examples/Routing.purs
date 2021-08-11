@@ -10,8 +10,9 @@ import Peregrine (Handler, choose)
 import Peregrine as Peregrine
 import Peregrine.Http.Headers (staticHeaderName)
 import Peregrine.Http.Method (Method(..))
+import Peregrine.Request.FromParam (class FromParam)
 import Peregrine.Response as Response
-import Peregrine.Routing (class FromParams, header, method, path, pathParams, pathPrefix)
+import Peregrine.Routing (header, method, path, pathParam, pathPrefix)
 import Type.Proxy (Proxy(..))
 
 makeUserHandler :: String -> Handler
@@ -27,25 +28,22 @@ listUsers = makeUserHandler "List Users"
 createUser :: Handler
 createUser = makeUserHandler "Create User"
 
-type UserId
-  = String
+newtype UserId
+  = UserId String
+
+derive newtype instance fromParamUserId :: FromParam UserId
 
 getUser :: UserId -> Handler
-getUser id = makeUserHandler $ "Get User " <> id
+getUser (UserId id) = makeUserHandler $ "Get User " <> id
 
 updateUser :: UserId -> Handler
-updateUser id = makeUserHandler $ "Update User " <> id
+updateUser (UserId id) = makeUserHandler $ "Update User " <> id
 
 deleteUser :: UserId -> Handler
-deleteUser id = makeUserHandler $ "Delete User " <> id
+deleteUser (UserId id) = makeUserHandler $ "Delete User " <> id
 
 newtype UserParams
   = UserParams { id :: UserId }
-
-instance fromParamsUserParams :: FromParams UserParams where
-  fromParams params = do
-    id <- params # Map.lookup "id"
-    pure $ UserParams { id }
 
 usersController :: Handler
 usersController =
@@ -55,7 +53,7 @@ usersController =
             [ method Get listUsers
             , method Post createUser
             ]
-    , pathParams "/<id>" \(UserParams { id }) ->
+    , pathParam "/<id>" \id ->
         choose
           [ method Get $ getUser id
           , method Put $ updateUser id

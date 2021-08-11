@@ -1,42 +1,21 @@
 module Test.Peregrine.RoutingSpec where
 
 import Prelude
-import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Request (Request)
 import Peregrine.Response as Response
-import Peregrine.Routing (class FromParams, pathParams)
+import Peregrine.Routing (pathParam, pathParams2)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Type.Proxy (Proxy(..))
 
-newtype IdParams
-  = IdParams { id :: String }
-
-instance fromParamsIdParams :: FromParams IdParams where
-  fromParams params = do
-    id <- params # Map.lookup "id"
-    Just $ IdParams { id }
-
-newtype NameParams
-  = NameParams
-  { firstName :: String
-  , lastName :: String
-  }
-
-instance fromParamsNameParams :: FromParams NameParams where
-  fromParams params = do
-    firstName <- params # Map.lookup "firstName"
-    lastName <- params # Map.lookup "lastName"
-    Just $ NameParams { firstName, lastName }
-
 routingSpec :: Spec Unit
 routingSpec = do
   describe "Routing" do
-    describe "pathParams" do
+    describe "pathParam" do
       describe "given a valid path with a single parameter" do
         it "matches" do
           let
@@ -52,9 +31,10 @@ routingSpec = do
                 Request
           result <-
             req
-              # pathParams "/<id>" \(IdParams { id }) _req ->
+              # pathParam "/<id>" \id _req ->
                   pure $ Just $ Response.ok # Response.addHeader xId id
           (result # map _.headers >>= Headers.lookup xId) `shouldEqual` Just "123"
+    describe "pathParams2" do
       describe "given a valid path with two parameters" do
         it "matches" do
           let
@@ -73,7 +53,7 @@ routingSpec = do
                 Request
           result <-
             req
-              # pathParams "/<firstName>/<lastName>" \(NameParams { firstName, lastName }) _req ->
+              # pathParams2 "/<firstName>/<lastName>" \firstName lastName _req ->
                   pure $ Just
                     $ Response.ok
                     # Response.addHeader xFirstName firstName
