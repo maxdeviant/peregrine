@@ -67,11 +67,18 @@ reportError error =
     $ Response.internalServerError
     # Response.withBody error
 
+-- | An alias for `pathParams1`.
 pathParam ::
   forall a.
   FromParam a =>
   String -> (a -> Handler) -> Handler
-pathParam path' next req = do
+pathParam = pathParams1
+
+pathParams1 ::
+  forall a.
+  FromParam a =>
+  String -> (a -> Handler) -> Handler
+pathParams1 path' next req = do
   case matchPath path' req.path of
     Right maybeMatches -> case maybeMatches of
       Just matches ->
@@ -84,12 +91,6 @@ pathParam path' next req = do
               Nothing -> pure Nothing
       Nothing -> pure Nothing
     Left error -> reportError error
-
-pathParams1 ::
-  forall a.
-  FromParam a =>
-  String -> (a -> Handler) -> Handler
-pathParams1 = pathParam
 
 pathParams2 ::
   forall a b.
