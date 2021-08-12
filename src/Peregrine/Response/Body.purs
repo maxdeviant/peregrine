@@ -1,27 +1,17 @@
 module Peregrine.Response.Body where
 
 import Prelude
-import Data.Either (Either(..))
-import Effect.Aff (Aff, makeAff, nonCanceler)
-import Effect.Class (liftEffect)
-import Node.Buffer (Buffer)
-import Node.Buffer as Buffer
+import Node.Buffer.Immutable (ImmutableBuffer)
+import Node.Buffer.Immutable as ImmutableBuffer
 import Node.Encoding (Encoding(..))
-import Node.HTTP as Http
-import Node.Stream as Stream
+import Safe.Coerce (coerce)
 
-class Body b where
-  write :: b -> Http.Response -> Aff Unit
+-- | An HTTP response body.
+newtype Body
+  = Body ImmutableBuffer
 
-instance bodyString :: Body String where
-  write body res = do
-    buffer :: Buffer <- liftEffect $ Buffer.fromString body UTF8
-    res # write buffer
+size :: Body -> Int
+size = coerce >>> ImmutableBuffer.size
 
-instance bodyBuffer :: Body Buffer where
-  write body res =
-    makeAff \callback -> do
-      let
-        stream = Http.responseAsStream res
-      _ <- Stream.write stream body $ Stream.end stream $ callback $ Right unit
-      pure nonCanceler
+text :: String -> Body
+text = flip ImmutableBuffer.fromString UTF8 >>> Body

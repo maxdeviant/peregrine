@@ -18,7 +18,7 @@ makeUserHandler title _req =
   pure
     $ Just
     $ Response.ok
-    # Response.withBody title
+    # Response.text title
 
 listUsers :: Handler
 listUsers = makeUserHandler "List Users"
@@ -72,7 +72,7 @@ secretArea =
     pure
       $ Just
       $ Response.ok
-      # Response.withBody message
+      # Response.text message
   where
   secretHeader = staticHeaderName (Proxy :: Proxy "X-Secret-Code")
 

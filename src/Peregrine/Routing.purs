@@ -65,7 +65,7 @@ reportError error =
   pure
     $ Just
     $ Response.internalServerError
-    # Response.withBody error
+    # Response.text error
 
 -- | An alias for `pathParams1`.
 pathParam ::

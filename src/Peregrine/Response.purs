@@ -1,10 +1,12 @@
 module Peregrine.Response
   ( Response
+  , empty
   , fromStatus
   , withHeaders
   , addHeader
   , addHeaders
   , withBody
+  , text
   -- 1xx: Information responses
   , continue
   , switchingProtocols
@@ -74,34 +76,48 @@ module Peregrine.Response
 
 import Prelude
 import Data.Maybe (Maybe(..))
-import Effect.Aff (Aff)
-import Node.HTTP as Http
-import Peregrine.Http.Headers (HeaderName, Headers, HeaderValue)
+import Peregrine.Http.Headers (HeaderName, HeaderValue, Headers, staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Status (Status)
 import Peregrine.Http.Status as Status
-import Peregrine.Response.Body (class Body)
+import Peregrine.Response.Body (Body)
 import Peregrine.Response.Body as Body
+import Type.Proxy (Proxy(..))
 
 -- | An HTTP response.
 type Response
   = { status :: Maybe Status
     , headers :: Headers
-    , writeBody :: Maybe (Http.Response -> Aff Unit)
+    , body :: Maybe Body
     }
+
+-- | An empty HTTP response.
+empty :: Response
+empty =
+  { status: Nothing
+  , headers: Headers.empty
+  , body: Nothing
+  }
 
 -- | Constructs a response from the specified HTTP status, using the status'
 -- | reason phrase as the response body.
 fromStatus :: Status -> Response
 fromStatus status =
-  { status: Just status
-  , headers: Headers.empty
-  , writeBody: Just $ Body.write status.reason
-  }
+  empty
+    # withStatus status
+    # text status.reason
+
+-- | Sets the response status, overwriting the previous status.
+withStatus :: Status -> Response -> Response
+withStatus status res = res { status = Just status }
 
 -- | Sets the response headers, overwriting any existing headers.
 withHeaders :: Headers -> Response -> Response
 withHeaders headers res = res { headers = headers }
+
+-- | Sets the response body, overwriting the previous response body.
+withBody :: Body -> Response -> Response
+withBody body res = res { body = Just body }
 
 -- | Adds a header to the response.
 -- |
@@ -113,8 +129,20 @@ addHeader name value res = res { headers = res.headers # Headers.insert name val
 addHeaders :: Headers -> Response -> Response
 addHeaders headers res = res { headers = res.headers <> headers }
 
-withBody :: forall b. Body b => b -> Response -> Response
-withBody body res = res { writeBody = Just $ Body.write body }
+contentType :: HeaderName
+contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
+
+contentLength :: HeaderName
+contentLength = staticHeaderName (Proxy :: Proxy "Content-Length")
+
+text :: String -> Response -> Response
+text plaintext res =
+  res
+    # addHeader contentType "text/plain"
+    # addHeader contentLength (show $ Body.size body)
+    # withBody body
+  where
+  body = Body.text plaintext
 
 -- | Returns a `100 Continue` response with the reason phrase in the body.
 continue :: Response

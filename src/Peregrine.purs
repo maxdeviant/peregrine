@@ -7,16 +7,18 @@ module Peregrine
 
 import Prelude
 import Data.Array (head, uncons)
-import Data.Either (Either, either, note)
+import Data.Either (Either(..), either, note)
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.String (Pattern(..), split)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
-import Effect.Aff (Aff, runAff)
+import Effect.Aff (Aff, makeAff, nonCanceler, runAff)
 import Effect.Aff.Class (liftAff)
 import Effect.Class (liftEffect)
 import Foreign.Object as Object
+import Node.Buffer as Buffer
 import Node.HTTP as Http
+import Node.Stream as Stream
 import Peregrine.Http.Headers (Headers(..))
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Headers.HeaderName as HeaderName
@@ -27,6 +29,8 @@ import Peregrine.Http.Status as Status
 import Peregrine.Request (Request)
 import Peregrine.Response (Response)
 import Peregrine.Response as Response
+import Peregrine.Response.Body (Body(..))
+import Peregrine.Response.Body as Body
 
 type Handler
   = Request -> Aff (Maybe Response)
@@ -90,13 +94,22 @@ writeHeaders res (Headers headers) =
   where
   setHeader key value = Http.setHeader res (show key) value
 
+writeBody :: Http.Response -> Body -> Aff Unit
+writeBody res (Body body) =
+  makeAff \callback -> do
+    let
+      stream = Http.responseAsStream res
+    buffer <- Buffer.thaw body
+    _ <- Stream.write stream buffer $ Stream.end stream $ callback $ Right unit
+    pure nonCanceler
+
 writeResponse :: Http.Response -> Response -> Aff Unit
 writeResponse res response = do
   let
     status = response.status # fromMaybe Status.ok
   liftEffect $ writeStatus res status
   liftEffect $ writeHeaders res response.headers
-  liftAff $ maybe (pure unit) ((#) res) response.writeBody
+  liftAff $ maybe (pure unit) (((#) res) writeBody) response.body
 
 mkRequestListener :: Handler -> RequestListener
 mkRequestListener handler req res = do
@@ -113,7 +126,7 @@ mkRequestListener handler req res = do
     pure
       $ Just
       $ Response.internalServerError
-      # Response.withBody message
+      # Response.withBody (Body.text message)
 
 defaultListenOptions :: Http.ListenOptions
 defaultListenOptions =
