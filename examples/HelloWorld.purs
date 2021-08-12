@@ -12,6 +12,7 @@ import Peregrine.Http.Headers (HeaderName, staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Status (Status)
 import Peregrine.Response as Response
+import Peregrine.Response.Body as Body
 import Peregrine.Routing (path)
 import Type.Proxy (Proxy(..))
 
@@ -38,6 +39,8 @@ loggingMiddleware handler req = do
     res.status # maybe (pure unit) (log <<< showStatus)
     log "Headers:"
     log $ indentLines $ show res.headers
+    log "Body:"
+    res.body # maybe (log "<None>") (log <<< Body.toString)
     where
     showStatus :: Status -> String
     showStatus { code, reason } = show code <> " " <> reason

@@ -7,6 +7,7 @@ import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Request (Request)
 import Peregrine.Response as Response
+import Peregrine.Response.Body as Body
 import Peregrine.Routing (pathParam, pathParams2)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -19,9 +20,6 @@ routingSpec = do
       describe "given a valid path with a single parameter" do
         it "matches" do
           let
-            xId :: HeaderName
-            xId = staticHeaderName (Proxy :: Proxy "X-ID")
-
             req =
               { method: Get
               , url: "/123"
@@ -32,8 +30,8 @@ routingSpec = do
           result <-
             req
               # pathParam "/<id>" \id _req ->
-                  pure $ Just $ Response.ok # Response.addHeader xId id
-          (result # map _.headers >>= Headers.lookup xId) `shouldEqual` Just "123"
+                  pure $ Just $ Response.ok # Response.text id
+          (result >>= _.body # map Body.toString) `shouldEqual` (Just "123")
     describe "pathParams2" do
       describe "given a valid path with two parameters" do
         it "matches" do
