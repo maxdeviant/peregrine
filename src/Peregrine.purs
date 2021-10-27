@@ -126,7 +126,7 @@ mkRequestListener handler req res = do
     pure
       $ Just
       $ Response.internalServerError
-          # Response.withBody (Body.text message)
+        # Response.text message
 
 defaultListenOptions :: Http.ListenOptions
 defaultListenOptions =
