@@ -62,8 +62,7 @@ helloWorld :: Handler
 helloWorld req =
   pure $ Just
     $ Response.ok
-    # Response.addHeader contentType "text/plain"
-    # Response.text (greeting req)
+      # Response.text (greeting req)
   where
   greeting { method, url } =
     "Hello, world from a "
@@ -76,7 +75,7 @@ admin :: Handler
 admin _req =
   pure $ Just
     $ Response.ok
-    # Response.text "Welcome to the admin panel."
+      # Response.text "Welcome to the admin panel."
 
 app :: Handler
 app =
