@@ -144,6 +144,15 @@ text plaintext res =
   where
   body = Body.text plaintext
 
+html :: String -> Response -> Response
+html htmlContent res =
+  res
+    # addHeader contentType "text/html; charset=utf-8"
+    # addHeader contentLength (show $ Body.size body)
+    # withBody body
+  where
+  body = Body.text htmlContent
+
 -- | Returns a `100 Continue` response with the reason phrase in the body.
 continue :: Response
 continue = fromStatus Status.continue
