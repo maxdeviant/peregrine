@@ -7,6 +7,7 @@ module Peregrine.Response
   , addHeaders
   , withBody
   , text
+  , html
   -- 1xx: Information responses
   , continue
   , switchingProtocols
