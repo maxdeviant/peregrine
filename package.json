@@ -7,7 +7,6 @@
   "author": "Marshall Bowers <elliott.codes@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "format": "purlin format && purty --write test/",
     "build": "purlin build",
     "test": "purlin test",
     "bump-version": "purlin bump-version"
