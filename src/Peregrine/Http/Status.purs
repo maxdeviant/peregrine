@@ -69,9 +69,10 @@ module Peregrine.Http.Status
 
 -- | An HTTP status.
 type Status
-  = { code :: Int
-    , reason :: String
-    }
+  =
+  { code :: Int
+  , reason :: String
+  }
 
 mkStatus :: Int -> String -> Status
 mkStatus code reason = { code, reason }

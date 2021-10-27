@@ -54,7 +54,7 @@ routingSpec = do
               # pathParams2 "/<firstName>/<lastName>" \firstName lastName _req ->
                   pure $ Just
                     $ Response.ok
-                    # Response.addHeader xFirstName firstName
-                    # Response.addHeader xLastName lastName
+                        # Response.addHeader xFirstName firstName
+                        # Response.addHeader xLastName lastName
           (result # map _.headers >>= Headers.lookup xFirstName) `shouldEqual` Just "john"
           (result # map _.headers >>= Headers.lookup xLastName) `shouldEqual` Just "smith"

@@ -87,10 +87,11 @@ import Type.Proxy (Proxy(..))
 
 -- | An HTTP response.
 type Response
-  = { status :: Maybe Status
-    , headers :: Headers
-    , body :: Maybe Body
-    }
+  =
+  { status :: Maybe Status
+  , headers :: Headers
+  , body :: Maybe Body
+  }
 
 -- | An empty HTTP response.
 empty :: Response

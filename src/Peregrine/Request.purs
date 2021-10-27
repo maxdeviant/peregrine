@@ -5,8 +5,9 @@ import Peregrine.Http.Method (Method)
 
 -- | An HTTP request.
 type Request
-  = { method :: Method
-    , url :: String
-    , path :: String
-    , headers :: Headers
-    }
+  =
+  { method :: Method
+  , url :: String
+  , path :: String
+  , headers :: Headers
+  }

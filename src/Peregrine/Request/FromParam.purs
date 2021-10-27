@@ -36,12 +36,12 @@ instance fromParamMaybe :: FromParam a => FromParam (Maybe a) where
   fromParam =
     fromParam
       >>> case _ of
-          Right value -> Right $ Just value
-          Left _ -> Right Nothing
+        Right value -> Right $ Just value
+        Left _ -> Right Nothing
 
 instance fromParamEither :: FromParam a => FromParam (Either String a) where
   fromParam =
     fromParam
       >>> case _ of
-          Right value -> Right $ Right value
-          Left param -> Right $ Left param
+        Right value -> Right $ Right value
+        Left param -> Right $ Left param

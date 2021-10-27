@@ -51,8 +51,8 @@ matchPath :: String → String → Either String (Maybe (Array (Maybe String)))
 matchPath path' requestPath =
   Regex.regex pattern noFlags
     # map \regex ->
-        Regex.match regex requestPath
-          # map (NonEmptyArray.drop 1)
+      Regex.match regex requestPath
+        # map (NonEmptyArray.drop 1)
   where
   pattern =
     path'
@@ -65,19 +65,23 @@ reportError error =
   pure
     $ Just
     $ Response.internalServerError
-    # Response.text error
+      # Response.text error
 
 -- | An alias for `pathParams1`.
 pathParam ::
   forall a.
   FromParam a =>
-  String -> (a -> Handler) -> Handler
+  String ->
+  (a -> Handler) ->
+  Handler
 pathParam = pathParams1
 
 pathParams1 ::
   forall a.
   FromParam a =>
-  String -> (a -> Handler) -> Handler
+  String ->
+  (a -> Handler) ->
+  Handler
 pathParams1 path' next req = do
   case matchPath path' req.path of
     Right maybeMatches -> case maybeMatches of
@@ -87,8 +91,8 @@ pathParams1 path' next req = do
           a <- a' >>= fromParam >>> hush
           Just { a }
           # case _ of
-              Just { a } -> next a req
-              Nothing -> pure Nothing
+            Just { a } -> next a req
+            Nothing -> pure Nothing
       Nothing -> pure Nothing
     Left error -> reportError error
 
@@ -96,7 +100,9 @@ pathParams2 ::
   forall a b.
   FromParam a =>
   FromParam b =>
-  String -> (a -> b -> Handler) -> Handler
+  String ->
+  (a -> b -> Handler) ->
+  Handler
 pathParams2 path' next req = do
   case matchPath path' req.path of
     Right maybeMatches -> case maybeMatches of
@@ -108,8 +114,8 @@ pathParams2 path' next req = do
           b <- b' >>= fromParam >>> hush
           Just { a, b }
           # case _ of
-              Just { a, b } -> next a b req
-              Nothing -> pure Nothing
+            Just { a, b } -> next a b req
+            Nothing -> pure Nothing
       Nothing -> pure Nothing
     Left error -> reportError error
 
@@ -118,7 +124,9 @@ pathParams3 ::
   FromParam a =>
   FromParam b =>
   FromParam c =>
-  String -> (a -> b -> c -> Handler) -> Handler
+  String ->
+  (a -> b -> c -> Handler) ->
+  Handler
 pathParams3 path' next req = do
   case matchPath path' req.path of
     Right maybeMatches -> case maybeMatches of
@@ -132,8 +140,8 @@ pathParams3 path' next req = do
           c <- c' >>= fromParam >>> hush
           Just { a, b, c }
           # case _ of
-              Just { a, b, c } -> next a b c req
-              Nothing -> pure Nothing
+            Just { a, b, c } -> next a b c req
+            Nothing -> pure Nothing
       Nothing -> pure Nothing
     Left error -> reportError error
 
