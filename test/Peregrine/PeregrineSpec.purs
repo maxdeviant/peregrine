@@ -20,6 +20,7 @@ peregrineSpec = do
         , url: "/"
         , path: "/"
         , headers: Headers.empty
+        , body: pure ""
         } ::
           Request
     describe "given an empty list of handlers" do

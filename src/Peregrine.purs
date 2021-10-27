@@ -15,8 +15,10 @@ import Effect (Effect)
 import Effect.Aff (Aff, makeAff, nonCanceler, runAff)
 import Effect.Aff.Class (liftAff)
 import Effect.Class (liftEffect)
+import Effect.Ref as Ref
 import Foreign.Object as Object
 import Node.Buffer as Buffer
+import Node.Encoding (Encoding(..))
 import Node.HTTP as Http
 import Node.Stream as Stream
 import Peregrine.Http.Headers (Headers(..))
@@ -30,7 +32,6 @@ import Peregrine.Request (Request)
 import Peregrine.Response (Response)
 import Peregrine.Response as Response
 import Peregrine.Response.Body (Body(..))
-import Peregrine.Response.Body as Body
 
 type Handler
   = Request -> Aff (Maybe Response)
@@ -69,6 +70,21 @@ parseHeaders = Http.requestHeaders >>> Object.foldMaybe tryInsert Headers.empty
     name <- key # HeaderName.fromString
     pure $ headers # Headers.insert name value
 
+parseBody :: Http.Request -> Aff String
+parseBody req =
+  makeAff \callback -> do
+    let
+      stream = Http.requestAsStream req
+    buffers <- Ref.new []
+    Stream.onData stream \buffer ->
+      void $ Ref.modify (_ <> [ buffer ]) buffers
+    Stream.onEnd stream do
+      body <- Ref.read buffers
+        >>= Buffer.concat
+        >>= Buffer.toString UTF8
+      callback $ Right body
+    pure nonCanceler
+
 parseRequest :: Http.Request -> Either String Request
 parseRequest req = do
   method <- req # parseMethod
@@ -79,6 +95,7 @@ parseRequest req = do
     , url
     , path: url # split (Pattern "?") >>> head >>> fromMaybe ""
     , headers: req # parseHeaders
+    , body: parseBody req
     }
 
 writeStatus :: Http.Response -> Status -> Effect Unit

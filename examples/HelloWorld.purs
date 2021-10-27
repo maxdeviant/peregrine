@@ -33,6 +33,9 @@ loggingMiddleware handler req = do
     log $ "Path: " <> req'.path
     log "Headers:"
     log $ indentLines $ show req'.headers
+    log "Body:"
+    body <- req'.body
+    log body
 
   logResponse res = do
     log "Returning response"

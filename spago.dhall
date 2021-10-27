@@ -19,6 +19,7 @@
   , "ordered-collections"
   , "prelude"
   , "psci-support"
+  , "refs"
   , "safe-coerce"
   , "spec"
   , "strings"

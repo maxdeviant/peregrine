@@ -25,12 +25,13 @@ routingSpec = do
               , url: "/123"
               , path: "/123"
               , headers: Headers.empty
+              , body: pure ""
               } ::
                 Request
           result <-
             req
               # pathParam "/<id>" \id _req ->
-                  pure $ Just $ Response.ok # Response.text id
+                pure $ Just $ Response.ok # Response.text id
           (result >>= _.body # map Body.toString) `shouldEqual` (Just "123")
     describe "pathParams2" do
       describe "given a valid path with two parameters" do
@@ -47,14 +48,15 @@ routingSpec = do
               , url: "/john/smith"
               , path: "/john/smith"
               , headers: Headers.empty
+              , body: pure ""
               } ::
                 Request
           result <-
             req
               # pathParams2 "/<firstName>/<lastName>" \firstName lastName _req ->
-                  pure $ Just
-                    $ Response.ok
-                        # Response.addHeader xFirstName firstName
-                        # Response.addHeader xLastName lastName
+                pure $ Just
+                  $ Response.ok
+                    # Response.addHeader xFirstName firstName
+                    # Response.addHeader xLastName lastName
           (result # map _.headers >>= Headers.lookup xFirstName) `shouldEqual` Just "john"
           (result # map _.headers >>= Headers.lookup xLastName) `shouldEqual` Just "smith"
