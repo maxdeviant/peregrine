@@ -138,7 +138,7 @@ contentLength = staticHeaderName (Proxy :: Proxy "Content-Length")
 text :: String -> Response -> Response
 text plaintext res =
   res
-    # addHeader contentType "text/plain"
+    # addHeader contentType "text/plain; charset=utf-8"
     # addHeader contentLength (show $ Body.size body)
     # withBody body
   where
