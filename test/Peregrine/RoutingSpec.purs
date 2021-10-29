@@ -6,8 +6,9 @@ import Peregrine.Http.Headers (HeaderName, staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Request (Request)
+import Peregrine.Request.Body as Request.Body
 import Peregrine.Response as Response
-import Peregrine.Response.Body as Body
+import Peregrine.Response.Body as Response.Body
 import Peregrine.Routing (pathParam, pathParams2)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -25,13 +26,14 @@ routingSpec = do
               , url: "/123"
               , path: "/123"
               , headers: Headers.empty
+              , body: Request.Body.empty
               } ::
                 Request
           result <-
             req
               # pathParam "/<id>" \id _req ->
                   pure $ Just $ Response.ok # Response.text id
-          (result >>= _.body # map Body.toString) `shouldEqual` (Just "123")
+          (result >>= _.body # map Response.Body.toString) `shouldEqual` (Just "123")
     describe "pathParams2" do
       describe "given a valid path with two parameters" do
         it "matches" do
@@ -47,6 +49,7 @@ routingSpec = do
               , url: "/john/smith"
               , path: "/john/smith"
               , headers: Headers.empty
+              , body: Request.Body.empty
               } ::
                 Request
           result <-
