@@ -8,17 +8,13 @@ import Effect (Effect)
 import Effect.Class.Console (log)
 import Peregrine (Handler, Middleware, choose)
 import Peregrine as Peregrine
-import Peregrine.Http.Headers (HeaderName, staticHeaderName)
+import Peregrine.Http.HeaderName as HeaderName
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Status (Status)
 import Peregrine.Request.Body (Body(..))
 import Peregrine.Response as Response
 import Peregrine.Response.Body as Body
 import Peregrine.Routing (path)
-import Type.Proxy (Proxy(..))
-
-contentType :: HeaderName
-contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
 
 loggingMiddleware :: Middleware
 loggingMiddleware handler req = do
@@ -56,13 +52,11 @@ loggingMiddleware handler req = do
 requireAuthorization :: Middleware
 requireAuthorization handler req = do
   let
-    authorizationValue = req.headers # Headers.lookup authorization
+    authorizationValue = req.headers # Headers.lookup HeaderName.authorization
   case authorizationValue of
     Just "Bearer open_sesame" -> handler req
     Just _ -> pure $ Just Response.unauthorized
     Nothing -> pure $ Just Response.unauthorized
-  where
-  authorization = staticHeaderName (Proxy :: Proxy "Authorization")
 
 helloWorld :: Handler
 helloWorld req =

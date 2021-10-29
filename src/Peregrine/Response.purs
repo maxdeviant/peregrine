@@ -77,13 +77,13 @@ module Peregrine.Response
 
 import Prelude
 import Data.Maybe (Maybe(..))
-import Peregrine.Http.Headers (HeaderName, HeaderValue, Headers, staticHeaderName)
+import Peregrine.Http.HeaderName as HeaderName
+import Peregrine.Http.Headers (HeaderName, HeaderValue, Headers)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Status (Status)
 import Peregrine.Http.Status as Status
 import Peregrine.Response.Body (Body)
 import Peregrine.Response.Body as Body
-import Type.Proxy (Proxy(..))
 
 -- | An HTTP response.
 type Response
@@ -131,17 +131,11 @@ addHeader name value res = res { headers = res.headers # Headers.insert name val
 addHeaders :: Headers -> Response -> Response
 addHeaders headers res = res { headers = res.headers <> headers }
 
-contentType :: HeaderName
-contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
-
-contentLength :: HeaderName
-contentLength = staticHeaderName (Proxy :: Proxy "Content-Length")
-
 text :: String -> Response -> Response
 text plaintext res =
   res
-    # addHeader contentType "text/plain; charset=utf-8"
-    # addHeader contentLength (show $ Body.size body)
+    # addHeader HeaderName.contentType "text/plain; charset=utf-8"
+    # addHeader HeaderName.contentLength (show $ Body.size body)
     # withBody body
   where
   body = Body.text plaintext
@@ -149,8 +143,8 @@ text plaintext res =
 html :: String -> Response -> Response
 html htmlContent res =
   res
-    # addHeader contentType "text/html; charset=utf-8"
-    # addHeader contentLength (show $ Body.size body)
+    # addHeader HeaderName.contentType "text/html; charset=utf-8"
+    # addHeader HeaderName.contentLength (show $ Body.size body)
     # withBody body
   where
   body = Body.text htmlContent

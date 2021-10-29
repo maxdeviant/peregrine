@@ -3,7 +3,7 @@ module Peregrine.BodySpec where
 import Prelude
 import Data.Maybe (Maybe(..))
 import Peregrine.Body (contentLengthLimit)
-import Peregrine.Http.Headers (HeaderName, staticHeaderName)
+import Peregrine.Http.HeaderName as HeaderName
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Http.Status as Status
@@ -12,10 +12,6 @@ import Peregrine.Request.Body as Request.Body
 import Peregrine.Response as Response
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Type.Proxy (Proxy(..))
-
-contentLength :: HeaderName
-contentLength = staticHeaderName (Proxy :: Proxy "Content-Length")
 
 bodySpec :: Spec Unit
 bodySpec = do
@@ -35,21 +31,21 @@ bodySpec = do
     describe "when the request has a valid `Content-Length` header" do
       describe "that is less than the specified limit" do
         it "accepts the request" do
-          let req = baseReq { headers = Headers.singleton contentLength "1023" }
+          let req = baseReq { headers = Headers.singleton HeaderName.contentLength "1023" }
 
           result <- req # contentLengthLimit 1024 success
           (result >>= _.status) `shouldEqual` Just Status.ok
 
       describe "that is equal to the specified limit" do
         it "accepts the request" do
-          let req = baseReq { headers = Headers.singleton contentLength "1024" }
+          let req = baseReq { headers = Headers.singleton HeaderName.contentLength "1024" }
 
           result <- req # contentLengthLimit 1024 success
           (result >>= _.status) `shouldEqual` Just Status.ok
 
       describe "that is greater than the specified limit" do
         it "returns 413 Payload Too Large" do
-          let req = baseReq { headers = Headers.singleton contentLength "1025" }
+          let req = baseReq { headers = Headers.singleton HeaderName.contentLength "1025" }
 
           result <- req # contentLengthLimit 1024 success
           (result >>= _.status) `shouldEqual` Just Status.payloadTooLarge

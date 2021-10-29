@@ -1,17 +1,10 @@
 module Test.Peregrine.Http.HeadersSpec where
 
 import Prelude
-import Peregrine.Http.Headers (HeaderName, staticHeaderName)
+import Peregrine.Http.HeaderName as HeaderName
 import Peregrine.Http.Headers as Headers
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Type.Proxy (Proxy(..))
-
-contentType :: HeaderName
-contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
-
-setCookie :: HeaderName
-setCookie = staticHeaderName (Proxy :: Proxy "Set-Cookie")
 
 headersSpec :: Spec Unit
 headersSpec = do
@@ -21,30 +14,30 @@ headersSpec = do
         let
           headers =
             Headers.empty
-              # Headers.insert contentType "application/json"
-              # Headers.insert setCookie "sessionId=38afes7a8"
+              # Headers.insert HeaderName.contentType "application/json"
+              # Headers.insert HeaderName.setCookie "sessionId=38afes7a8"
         show headers `shouldEqual` "Content-Type: application/json\nSet-Cookie: sessionId=38afes7a8"
   describe "append (<>)" do
     describe "when a header exists in the first collection but not the second" do
       it "keeps the header value" do
-        (Headers.singleton contentType "application/json" <> Headers.empty)
+        (Headers.singleton HeaderName.contentType "application/json" <> Headers.empty)
           `shouldEqual`
-            Headers.singleton contentType "application/json"
+            Headers.singleton HeaderName.contentType "application/json"
     describe "when a header exists in the second collection but not the first" do
       it "keeps the header value" do
-        (Headers.empty <> Headers.singleton contentType "application/json")
+        (Headers.empty <> Headers.singleton HeaderName.contentType "application/json")
           `shouldEqual`
-            Headers.singleton contentType "application/json"
+            Headers.singleton HeaderName.contentType "application/json"
     describe "when a header exists in both collections" do
       it "keeps the header value from the second collection" do
-        (Headers.singleton contentType "text/html" <> Headers.singleton contentType "application/json")
+        (Headers.singleton HeaderName.contentType "text/html" <> Headers.singleton HeaderName.contentType "application/json")
           `shouldEqual`
-            Headers.singleton contentType "application/json"
+            Headers.singleton HeaderName.contentType "application/json"
     describe "when the collections contain disparate headers" do
       it "merges the headers from both collections" do
-        (Headers.singleton contentType "application/json" <> Headers.singleton setCookie "sessionId=38afes7a8")
+        (Headers.singleton HeaderName.contentType "application/json" <> Headers.singleton HeaderName.setCookie "sessionId=38afes7a8")
           `shouldEqual`
             ( Headers.empty
-                # Headers.insert contentType "application/json"
-                # Headers.insert setCookie "sessionId=38afes7a8"
+                # Headers.insert HeaderName.contentType "application/json"
+                # Headers.insert HeaderName.setCookie "sessionId=38afes7a8"
             )
