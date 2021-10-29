@@ -14,11 +14,11 @@ module Peregrine.Http.HeaderName
   , cookie
   , setCookie
   -- Message body information
-,  contentLength
-,contentType
-,contentEncoding
-,contentLanguage
-,contentLocation
+  , contentLength
+  , contentType
+  , contentEncoding
+  , contentLanguage
+  , contentLocation
   ) where
 
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
