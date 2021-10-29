@@ -4,6 +4,12 @@ module Peregrine.Http.HeaderName
   , authorization
   , proxyAuthenticate
   , proxyAuthorization
+  -- Caching
+  , age
+  , cacheControl
+  , clearSiteData
+  , expires
+  , pragma
   ) where
 
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
@@ -34,3 +40,36 @@ proxyAuthenticate = staticHeaderName (Proxy :: Proxy "Proxy-Authenticate")
 -- | Contains the credentials to authenticate a user agent with a proxy server.
 proxyAuthorization :: HeaderName
 proxyAuthorization = staticHeaderName (Proxy :: Proxy "Proxy-Authorization")
+
+{- Caching -}
+
+-- | `Age`
+-- |
+-- | The time, in seconds, that the object has been in a proxy cache.
+age :: HeaderName
+age = staticHeaderName (Proxy :: Proxy "Age")
+
+-- | `Cache-Control`
+-- |
+-- | Directives for caching mechanisms in both requests and responses.
+cacheControl :: HeaderName
+cacheControl = staticHeaderName (Proxy :: Proxy "Cache-Control")
+
+-- | `Clear-Site-Data`
+-- |
+-- | Clears browsing data (e.g. cookies, storage, cache) associated with the requesting website.
+clearSiteData :: HeaderName
+clearSiteData = staticHeaderName (Proxy :: Proxy "Clear-Site-Data")
+
+-- | `Expires`
+-- |
+-- | The date/time after which the response is considered stale.
+expires :: HeaderName
+expires = staticHeaderName (Proxy :: Proxy "Expires")
+
+-- | `Pragma`
+-- |
+-- | Implementation-specific header that may have various effects anywhere along the request-response chain. Used for
+-- | backwards compatibility with HTTP/1.0 caches where the `Cache-Control` header is not yet present.
+pragma :: HeaderName
+pragma = staticHeaderName (Proxy :: Proxy "Pragma")
