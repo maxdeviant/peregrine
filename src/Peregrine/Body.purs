@@ -1,5 +1,6 @@
 module Peregrine.Body
   ( contentLengthLimit
+  , contentType
   ) where
 
 import Prelude
@@ -19,3 +20,14 @@ contentLengthLimit limit next req = do
       else
         pure $ Just $ Response.payloadTooLarge
     Nothing -> pure $ Just $ Response.lengthRequired
+
+-- TODO: Use a stronger type.
+type MediaType = String
+
+contentType :: MediaType -> Handler -> Handler
+contentType mediaType next req = do
+  case req.headers # Headers.lookup HeaderName.contentType of
+    Just mediaType' | mediaType' == mediaType ->
+      next req
+    Just _ -> pure Nothing
+    Nothing -> pure Nothing
