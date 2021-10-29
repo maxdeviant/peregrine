@@ -13,6 +13,12 @@ module Peregrine.Http.HeaderName
   -- Cookies
   , cookie
   , setCookie
+  -- Message body information
+,  contentLength
+,contentType
+,contentEncoding
+,contentLanguage
+,contentLocation
   ) where
 
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
@@ -90,3 +96,35 @@ cookie = staticHeaderName (Proxy :: Proxy "Cookie")
 -- | Send cookies from the server to the user-agent.
 setCookie :: HeaderName
 setCookie = staticHeaderName (Proxy :: Proxy "Set-Cookie")
+
+{- Message body information -}
+
+-- | `Content-Length`
+-- |
+-- | The size of the resource, in decimal number of bytes.
+contentLength :: HeaderName
+contentLength = staticHeaderName (Proxy :: Proxy "Content-Length")
+
+-- | `Content-Type`
+-- |
+-- | Indicates the media type of the resource.
+contentType :: HeaderName
+contentType = staticHeaderName (Proxy :: Proxy "Content-Type")
+
+-- | `Content-Encoding`
+-- |
+-- | Used to specify the compression algorithm.
+contentEncoding :: HeaderName
+contentEncoding = staticHeaderName (Proxy :: Proxy "Content-Encoding")
+
+-- | `Content-Language`
+-- |
+-- | Describes the human language(s) intended for the audience, so that it allows a user to differentiate according to the users' own preferred language.
+contentLanguage :: HeaderName
+contentLanguage = staticHeaderName (Proxy :: Proxy "Content-Language")
+
+-- | `Content-Location`
+-- |
+-- | Indicates an alternate location for the returned data.
+contentLocation :: HeaderName
+contentLocation = staticHeaderName (Proxy :: Proxy "Content-Location")
