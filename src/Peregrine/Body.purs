@@ -14,7 +14,7 @@ import Data.Maybe (Maybe(..))
 import Peregrine (Handler)
 import Peregrine.Http.HeaderName as HeaderName
 import Peregrine.Http.Headers as Headers
-import Peregrine.Request.Body (Body(..))
+import Peregrine.Request as Request
 import Peregrine.Response as Response
 
 contentLengthLimit :: Int -> Handler -> Handler
@@ -40,10 +40,8 @@ contentType mediaType next req = do
 
 tryJson :: forall a. DecodeJson a => (Either JsonDecodeError a -> Handler) -> Handler
 tryJson = contentType "application/json" <<< \next req -> do
-  content <- case req.body of
-    NotParsed body -> body
-    Parsed body -> pure body
-  next (content # parseJson >>= decodeJson) req
+  { body, req' } <- Request.parseBody req
+  next (body # parseJson >>= decodeJson) req'
 
 json :: forall a. DecodeJson a => (a -> Handler) -> Handler
 json = tryJson <<< \next eitherJson req -> do

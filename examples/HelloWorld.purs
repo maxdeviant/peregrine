@@ -15,14 +15,14 @@ import Peregrine.Http.HeaderName as HeaderName
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Http.Status (Status)
-import Peregrine.Request.Body (Body(..))
+import Peregrine.Request as Request
 import Peregrine.Response as Response
 import Peregrine.Response.Body as Body
 import Peregrine.Routing (method, path)
 
 loggingMiddleware :: Middleware
-loggingMiddleware handler req = do
-  logRequest req
+loggingMiddleware handler originalReq = do
+  req <- logRequest originalReq
   response <- handler req
   response # maybe (pure unit) logResponse
   pure response
@@ -35,12 +35,9 @@ loggingMiddleware handler req = do
     log "Headers:"
     log $ indentLines $ show req'.headers
     log "Body:"
-    -- TODO: If we use the body here then it stalls out the request down below
-    -- when we try to parse the JSON.
-    -- body <- case req'.body of
-    --   NotParsed body -> body
-    --   Parsed body -> pure body
-    -- log body
+    { body, req': req } <- Request.parseBody req'
+    log body
+    pure req
 
   logResponse res = do
     log "Returning response"
@@ -95,7 +92,6 @@ type Todo =
 
 createTodo :: Either JsonDecodeError NewTodo -> Handler
 createTodo eitherNewTodo _req = do
-  log "createTodo"
   case eitherNewTodo of
     Right newTodo ->
       let
