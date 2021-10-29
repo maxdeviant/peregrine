@@ -10,6 +10,9 @@ module Peregrine.Http.HeaderName
   , clearSiteData
   , expires
   , pragma
+  -- Cookies
+  , cookie
+  , setCookie
   ) where
 
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
@@ -73,3 +76,17 @@ expires = staticHeaderName (Proxy :: Proxy "Expires")
 -- | backwards compatibility with HTTP/1.0 caches where the `Cache-Control` header is not yet present.
 pragma :: HeaderName
 pragma = staticHeaderName (Proxy :: Proxy "Pragma")
+
+{- Cookies -}
+
+-- | `Cookie`
+-- |
+-- | Contains stored HTTP cookies previously sent by the server with the `Set-Cookie` header.
+cookie :: HeaderName
+cookie = staticHeaderName (Proxy :: Proxy "Cookie")
+
+-- | `Set-Cookie`
+-- |
+-- | Send cookies from the server to the user-agent.
+setCookie :: HeaderName
+setCookie = staticHeaderName (Proxy :: Proxy "Set-Cookie")
