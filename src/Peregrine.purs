@@ -30,7 +30,6 @@ import Peregrine.Request (Request)
 import Peregrine.Response (Response)
 import Peregrine.Response as Response
 import Peregrine.Response.Body (Body(..))
-import Peregrine.Response.Body as Body
 
 type Handler
   = Request -> Aff (Maybe Response)
