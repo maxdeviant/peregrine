@@ -51,8 +51,8 @@ matchPath :: String → String → Either String (Maybe (Array (Maybe String)))
 matchPath path' requestPath =
   Regex.regex pattern noFlags
     # map \regex ->
-      Regex.match regex requestPath
-        # map (NonEmptyArray.drop 1)
+        Regex.match regex requestPath
+          # map (NonEmptyArray.drop 1)
   where
   pattern =
     path'
@@ -65,7 +65,7 @@ reportError error =
   pure
     $ Just
     $ Response.internalServerError
-      # Response.text error
+        # Response.text error
 
 -- | An alias for `pathParams1`.
 pathParam ::
@@ -91,8 +91,8 @@ pathParams1 path' next req = do
           a <- a' >>= fromParam >>> hush
           Just { a }
           # case _ of
-            Just { a } -> next a req
-            Nothing -> pure Nothing
+              Just { a } -> next a req
+              Nothing -> pure Nothing
       Nothing -> pure Nothing
     Left error -> reportError error
 
@@ -114,8 +114,8 @@ pathParams2 path' next req = do
           b <- b' >>= fromParam >>> hush
           Just { a, b }
           # case _ of
-            Just { a, b } -> next a b req
-            Nothing -> pure Nothing
+              Just { a, b } -> next a b req
+              Nothing -> pure Nothing
       Nothing -> pure Nothing
     Left error -> reportError error
 
@@ -140,8 +140,8 @@ pathParams3 path' next req = do
           c <- c' >>= fromParam >>> hush
           Just { a, b, c }
           # case _ of
-            Just { a, b, c } -> next a b c req
-            Nothing -> pure Nothing
+              Just { a, b, c } -> next a b c req
+              Nothing -> pure Nothing
       Nothing -> pure Nothing
     Left error -> reportError error
 
