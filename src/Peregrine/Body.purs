@@ -6,6 +6,7 @@ module Peregrine.Body
   ) where
 
 import Prelude
+
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError, decodeJson, parseJson)
 import Data.Either (Either(..))
 import Data.Int as Int

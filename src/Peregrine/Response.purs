@@ -8,6 +8,7 @@ module Peregrine.Response
   , withBody
   , text
   , html
+  , json
   -- 1xx: Information responses
   , continue
   , switchingProtocols
@@ -76,6 +77,8 @@ module Peregrine.Response
   ) where
 
 import Prelude
+import Data.Argonaut.Core as Json
+import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Maybe (Maybe(..))
 import Peregrine.Http.HeaderName as HeaderName
 import Peregrine.Http.Headers (HeaderName, HeaderValue, Headers)
@@ -148,6 +151,17 @@ html htmlContent res =
     # withBody body
   where
   body = Body.text htmlContent
+
+json :: forall a. EncodeJson a => a -> Response -> Response
+json content res =
+  res
+    # addHeader HeaderName.contentType "application/json"
+    # addHeader HeaderName.contentLength (show $ Body.size body)
+    # withBody body
+  where
+  jsonContent = Json.stringify $ encodeJson content
+
+  body = Body.text jsonContent
 
 -- | Returns a `100 Continue` response with the reason phrase in the body.
 continue :: Response

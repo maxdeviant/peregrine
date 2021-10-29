@@ -1,20 +1,24 @@
 module Examples.HelloWorld where
 
 import Prelude
+import Data.Argonaut.Decode (JsonDecodeError, printJsonDecodeError)
 import Data.Array (intercalate)
-import Data.Maybe (Maybe(..), maybe)
+import Data.Either (Either(..))
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.String.Utils (lines)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Peregrine (Handler, Middleware, choose)
+import Peregrine (Middleware, Handler, choose)
 import Peregrine as Peregrine
+import Peregrine.Body (contentLengthLimit, tryJson)
 import Peregrine.Http.HeaderName as HeaderName
 import Peregrine.Http.Headers as Headers
+import Peregrine.Http.Method (Method(..))
 import Peregrine.Http.Status (Status)
 import Peregrine.Request.Body (Body(..))
 import Peregrine.Response as Response
 import Peregrine.Response.Body as Body
-import Peregrine.Routing (path)
+import Peregrine.Routing (method, path)
 
 loggingMiddleware :: Middleware
 loggingMiddleware handler req = do
@@ -31,10 +35,12 @@ loggingMiddleware handler req = do
     log "Headers:"
     log $ indentLines $ show req'.headers
     log "Body:"
-    body <- case req'.body of
-      NotParsed body -> body
-      Parsed body -> pure body
-    log body
+    -- TODO: If we use the body here then it stalls out the request down below
+    -- when we try to parse the JSON.
+    -- body <- case req'.body of
+    --   NotParsed body -> body
+    --   Parsed body -> pure body
+    -- log body
 
   logResponse res = do
     log "Returning response"
@@ -77,10 +83,36 @@ admin _req =
     $ Response.ok
       # Response.text "Welcome to the admin panel."
 
+type NewTodo =
+  { name :: String
+  , completed :: Maybe Boolean
+  }
+
+type Todo =
+  { name :: String
+  , completed :: Boolean
+  }
+
+createTodo :: Either JsonDecodeError NewTodo -> Handler
+createTodo eitherNewTodo _req = do
+  log "createTodo"
+  case eitherNewTodo of
+    Right newTodo ->
+      let
+        todo = { name: newTodo.name, completed: fromMaybe false newTodo.completed }
+      in
+        pure $ Just $ Response.ok # Response.json todo
+    Left err ->
+      pure $ Just $ Response.badRequest # Response.json { message: printJsonDecodeError err }
+
 app :: Handler
 app =
   choose
     [ path "/" $ helloWorld
+    , path "/todos"
+        $ method Post
+        $ contentLengthLimit (32 * 1024)
+        $ tryJson createTodo
     , path
         "/admin"
         $ requireAuthorization admin
