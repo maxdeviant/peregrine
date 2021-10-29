@@ -8,6 +8,7 @@ import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Method (Method(..))
 import Peregrine.Http.Status as Status
 import Peregrine.Request (Request)
+import Peregrine.Request.Body as Request.Body
 import Peregrine.Response as Response
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -25,6 +26,7 @@ bodySpec = do
         , url: "/"
         , path: "/"
         , headers: Headers.empty
+        , body: Request.Body.empty
         } ::
           Request
 
