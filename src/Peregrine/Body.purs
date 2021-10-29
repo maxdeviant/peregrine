@@ -1,14 +1,19 @@
 module Peregrine.Body
   ( contentLengthLimit
   , contentType
+  , tryJson
+  , json
   ) where
 
 import Prelude
+import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError, decodeJson, parseJson)
+import Data.Either (Either(..))
 import Data.Int as Int
 import Data.Maybe (Maybe(..))
 import Peregrine (Handler)
 import Peregrine.Http.HeaderName as HeaderName
 import Peregrine.Http.Headers as Headers
+import Peregrine.Request.Body (Body(..))
 import Peregrine.Response as Response
 
 contentLengthLimit :: Int -> Handler -> Handler
@@ -31,3 +36,16 @@ contentType mediaType next req = do
       next req
     Just _ -> pure Nothing
     Nothing -> pure Nothing
+
+tryJson :: forall a. DecodeJson a => (Either JsonDecodeError a -> Handler) -> Handler
+tryJson = contentType "application/json" <<< \next req -> do
+  content <- case req.body of
+    NotParsed body -> body
+    Parsed body -> pure body
+  next (content # parseJson >>= decodeJson) req
+
+json :: forall a. DecodeJson a => (a -> Handler) -> Handler
+json = tryJson <<< \next eitherJson req -> do
+  case eitherJson of
+    Right json' -> next json' req
+    Left _err -> pure Nothing

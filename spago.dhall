@@ -3,6 +3,7 @@
 , repository = "https://github.com/maxdeviant/peregrine"
 , dependencies =
   [ "aff"
+  , "argonaut-codecs"
   , "arrays"
   , "console"
   , "effect"
