@@ -6,6 +6,7 @@ module Peregrine
   ) where
 
 import Prelude
+
 import Data.Array (head, uncons)
 import Data.Either (Either(..), either, note)
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
@@ -29,6 +30,7 @@ import Peregrine.Http.Method as Method
 import Peregrine.Http.Status (Status)
 import Peregrine.Http.Status as Status
 import Peregrine.Request (Request)
+import Peregrine.Request.Body as Request.Body
 import Peregrine.Response (Response)
 import Peregrine.Response as Response
 import Peregrine.Response.Body (Body(..))
@@ -95,7 +97,7 @@ parseRequest req = do
     , url
     , path: url # split (Pattern "?") >>> head >>> fromMaybe ""
     , headers: req # parseHeaders
-    , body: parseBody req
+    , body: Request.Body.NotParsed $ parseBody req
     }
 
 writeStatus :: Http.Response -> Status -> Effect Unit

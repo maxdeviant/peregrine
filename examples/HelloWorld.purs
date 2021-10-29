@@ -11,6 +11,7 @@ import Peregrine as Peregrine
 import Peregrine.Http.Headers (HeaderName, staticHeaderName)
 import Peregrine.Http.Headers as Headers
 import Peregrine.Http.Status (Status)
+import Peregrine.Request.Body (Body(..))
 import Peregrine.Response as Response
 import Peregrine.Response.Body as Body
 import Peregrine.Routing (path)
@@ -34,7 +35,9 @@ loggingMiddleware handler req = do
     log "Headers:"
     log $ indentLines $ show req'.headers
     log "Body:"
-    body <- req'.body
+    body <- case req'.body of
+      NotParsed body -> body
+      Parsed body -> pure body
     log body
 
   logResponse res = do

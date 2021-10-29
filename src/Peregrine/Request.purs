@@ -1,8 +1,8 @@
 module Peregrine.Request where
 
-import Effect.Aff (Aff)
 import Peregrine.Http.Headers (Headers)
 import Peregrine.Http.Method (Method)
+import Peregrine.Request.Body (Body)
 
 -- | An HTTP request.
 type Request
@@ -11,5 +11,5 @@ type Request
   , url :: String
   , path :: String
   , headers :: Headers
-  , body :: Aff String
+  , body :: Body
   }
